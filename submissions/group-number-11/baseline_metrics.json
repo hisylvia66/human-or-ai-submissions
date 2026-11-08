@@ -1,0 +1,29 @@
+{
+  "model": "word TF-IDF (1,2)-gram + Logistic Regression",
+  "random_state": 42,
+  "train_n": 8000,
+  "validation_n": 2000,
+  "train_class_counts": {
+    "0": 4000,
+    "1": 4000
+  },
+  "validation_class_counts": {
+    "0": 1000,
+    "1": 1000
+  },
+  "train_auroc": 0.995328875,
+  "validation_auroc": 0.934348,
+  "fit_time_seconds": 3.45,
+  "n_features": 100000,
+  "params": {
+    "ngram_range": [
+      1,
+      2
+    ],
+    "min_df": 2,
+    "max_features": 100000,
+    "sublinear_tf": true,
+    "C": 1.0,
+    "max_iter": 1000
+  }
+}
