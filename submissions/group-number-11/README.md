@@ -1,9 +1,9 @@
 # Group Number 11 — Human or AI?
 
 ## Team Members
-- Name / NetID
-- Name / NetID
-- Name / NetID
+- Yilin Gao / yg695
+- Yingzi Gu / yg667
+- Ansh Raj Bhargava / ab3396
 
 ## Kaggle Team
 Group Number 11
