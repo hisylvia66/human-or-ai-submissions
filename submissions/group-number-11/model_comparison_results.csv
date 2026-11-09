@@ -1,0 +1,4 @@
+model,train_auroc,validation_auroc,fit_time_seconds
+Word TF-IDF + Logistic Regression,0.995328875,0.934348,9.479
+Word TF-IDF + Linear SVM,1.0,0.942943,8.699
+Word TF-IDF + Complement Naive Bayes,0.98434625,0.896094,6.255
