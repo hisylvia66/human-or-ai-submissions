@@ -1,0 +1,11 @@
+model,C,train_auroc,validation_auroc
+Logistic Regression,0.1,0.959491,0.908727
+Logistic Regression,0.5,0.986458,0.928661
+Logistic Regression,1.0,0.995329,0.934348
+Logistic Regression,2.0,0.999374,0.938813
+Logistic Regression,5.0,0.999999,0.941616
+Linear SVM,0.01,0.956642,0.905745
+Linear SVM,0.1,0.995018,0.9348
+Linear SVM,0.5,1.0,0.943264
+Linear SVM,1.0,1.0,0.942943
+Linear SVM,2.0,1.0,0.941734
