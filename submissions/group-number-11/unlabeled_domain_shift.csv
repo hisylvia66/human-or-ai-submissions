@@ -1,0 +1,4 @@
+pair,auroc
+train vs unlabeled,0.5796810833333332
+train vs test,0.7319810416666667
+unlabeled vs test,0.7153606666666668
