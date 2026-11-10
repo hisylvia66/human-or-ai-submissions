@@ -23,7 +23,9 @@ Paired bootstrap 95% CIs vs R1 are reported for every condition.
 Diagnostic: how many texts in train / unlabeled / test already contain non-ASCII letters,
 Cyrillic characters or zero-width characters (are these attacks actually present?).
 
-Run:  python run_robustness_improvement.py            (downloads data if needed)
+Run:  python run_robustness_improvement.py                 (finds / downloads the data itself)
+      python run_robustness_improvement.py --submit R2     (also retrain R2 on all 10,000 labeled
+                                                            rows and write submission_R2.csv)
 """
 from __future__ import annotations
 
@@ -35,12 +37,14 @@ import unicodedata
 
 import numpy as np
 import pandas as pd
+from scipy.special import expit
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics import roc_auc_score
 from sklearn.pipeline import FeatureUnion
 from sklearn.svm import LinearSVC
 
-from data_utils import SEED, load_split, load_test, load_unlabeled
+from data_utils import (SEED, load_sample_submission, load_split, load_test, load_train,
+                        load_unlabeled, paired_bootstrap)
 
 C = 0.5
 
@@ -132,15 +136,6 @@ class Model:
         return self.clf.decision_function(self.feats.transform(self._prep(texts)))
 
 
-def paired_bootstrap(y, a, b, n=1000, seed=SEED):
-    rng = np.random.default_rng(seed)
-    d = []
-    for _ in range(n):
-        i = rng.integers(0, len(y), len(y))
-        d.append(roc_auc_score(y[i], b[i]) - roc_auc_score(y[i], a[i]))
-    return float(np.mean(d)), *np.percentile(d, [2.5, 97.5])
-
-
 def char_census(name, texts, labels=None):
     s = pd.Series(list(texts))
     flags = pd.DataFrame({
@@ -164,6 +159,7 @@ def main():
     ap.add_argument("--data_dir", default="data")
     ap.add_argument("--configs", default="R0,R1,R2,R3")
     ap.add_argument("--out", default="robustness_improvement_results.csv")
+    ap.add_argument("--submit", default="", help="config to retrain on all 10k rows for Kaggle")
     args = ap.parse_args()
 
     tr, va = load_split(args.data_dir)
@@ -212,6 +208,18 @@ def main():
         preds[f"score_{cfg}"] = scores[cfg]["clean"]
     preds.to_csv("robustness_validation_scores.csv", index=False)
     print(f"\nwrote {args.out}, robustness_char_census.csv, robustness_validation_scores.csv")
+
+    if args.submit:
+        desc, feats, norm, aug = CONFIGS[args.submit]
+        full = load_train(args.data_dir)
+        sample = load_sample_submission(args.data_dir)
+        m = Model(feats, norm, aug).fit(full.text, full.label)
+        pred = pd.DataFrame({"id": te.id, "p": expit(m.score(te.text))})  # same sigmoid as generate_submission.py
+        col = [c for c in sample.columns if c.lower() != "id"][0]
+        sub = sample[["id"]].merge(pred, on="id", how="left").rename(columns={"p": col})
+        assert len(sub) == len(sample) and sub[col].notna().all() and sub[col].between(0, 1).all()
+        sub.to_csv(f"submission_{args.submit}.csv", index=False)
+        print(f"wrote submission_{args.submit}.csv ({desc}, trained on {len(full)} labeled rows)")
 
 
 if __name__ == "__main__":
