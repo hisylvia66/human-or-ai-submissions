@@ -1,0 +1,42 @@
+{
+  "5234": {
+    "observed_pattern": "Conversational technical troubleshooting",
+    "possible_reason": "The human passage repeatedly describes keyboard LED behavior in an orderly problem narrative. Repeated technical vocabulary and explanatory transitions may resemble generated troubleshooting text, despite informal punctuation, a misspelling, and a personal closing question."
+  },
+  "3671": {
+    "observed_pattern": "Polished encyclopedic biography",
+    "possible_reason": "The human passage uses third-person biographical facts, institutional names, and smooth explanatory sentences. These surface features overlap with generated biographies; local word and character features cannot establish authorship from factual exposition alone."
+  },
+  "7562": {
+    "observed_pattern": "Recipe formatting and promotional prose",
+    "possible_reason": "The human recipe repeats ingredient measurements and brand names, then uses polished promotional suggestions. Formulaic structure and repetitive positive descriptions may trigger AI-associated features even though this is a human-labeled recipe."
+  },
+  "2002": {
+    "observed_pattern": "Conversational history question",
+    "possible_reason": "The human passage repeats questions about rulers and thrones with several explanatory transitions. This organized question-answer prompt style may overlap with generated forum content; informal capitalization and colloquial phrasing did not prevent a false positive."
+  },
+  "3743": {
+    "observed_pattern": "First-person writing-advice request",
+    "possible_reason": "The human passage describes a fiction project using recurring terms about characters, world-building, and writing, then requests advice. Topic and locally fluent phrasing may overlap with generated writing advice, despite first-person details and casual wording."
+  },
+  "1524": {
+    "observed_pattern": "Technical excerpt followed by a personal question",
+    "possible_reason": "The AI passage combines dense quantum-optics terminology with a first-person request for explanation. Its mixed abstract/forum format and reference to missing visual context resemble a copied human discussion; local TF-IDF features do not assess whether the entire passage is coherent."
+  },
+  "3062": {
+    "observed_pattern": "Informal first-person forum narrative",
+    "possible_reason": "The AI passage contains a greeting, personal details, uncertainty, repetitions, and awkward phrasing. These resemble informal human forum writing and may outweigh AI-associated features; first-person voice and imperfect grammar are not reliable authorship indicators."
+  },
+  "473": {
+    "observed_pattern": "Quoted forum question and attributed reply",
+    "possible_reason": "The AI passage imitates a discussion with a quoted personal question, an attributed answer, Portuguese institution names, and a link-style ending. These source-like formatting cues may resemble human web text, while bag-of-ngram features do not verify provenance."
+  },
+  "4600": {
+    "observed_pattern": "Reference-style sports biography",
+    "possible_reason": "The AI passage lists names, dates, rankings, family details, and an apparent citation-number artifact. This resembles scraped reference material. Such formatting can mimic human biographies, and TF-IDF does not check factual consistency or source authenticity."
+  },
+  "9490": {
+    "observed_pattern": "Recipe surface form with inconsistent instructions",
+    "possible_reason": "The AI passage looks like a recipe but describes meatloaf without listing meat and repeatedly shifts between bread, patties, and unrelated preparation steps. Familiar recipe vocabulary may dominate its score; local n-grams miss ingredient-to-instruction consistency and long-range procedural coherence."
+  }
+}

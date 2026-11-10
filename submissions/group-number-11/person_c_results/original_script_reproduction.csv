@@ -1,0 +1,5 @@
+model,C,train_auroc,validation_auroc,fit_time_seconds
+Word + Character TF-IDF + Linear SVM,0.1,0.9996260625,0.966636,0.430933709256351
+Word + Character TF-IDF + Linear SVM,0.25,0.999999625,0.970348,0.4774370407685637
+Word + Character TF-IDF + Linear SVM,0.5,1.0,0.971228,0.6035605426877737
+Word + Character TF-IDF + Linear SVM,1.0,1.0,0.971158,0.7745621660724282

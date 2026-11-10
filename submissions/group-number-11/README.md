@@ -125,7 +125,9 @@ It never creates another train/validation split. Results go to `person_c_results
 - Q4 uses the 8,000-row model from Q2. Length is whitespace-separated word count;
   training-set tertiles define short/medium/long groups. Outputs:
   `length_group_results.csv`, `validation_predictions.csv`,
-  `selected_error_predictions.csv`, and `evaluation_summary.json`.
+  `selected_error_predictions.csv`, `error_analysis.csv`, and `evaluation_summary.json`.
+  Reviewed case annotations are stored in `person_c_error_notes.json`; if a rerun
+  selects a different ID, its explanation is marked `REQUIRES TEXT REVIEW`.
 - AUROC and FP/FN use the original SVM margins (classification threshold 0).
   P(AI) comes from a logistic sigmoid fitted to three-fold out-of-fold training
   margins, refitting the full feature pipeline per fold. This preserves the
@@ -139,12 +141,33 @@ It never creates another train/validation split. Results go to `person_c_results
   training subsets. Length groups can differ in topic and class composition.
 
 The script records software versions, input/split hashes, group boundaries, and
-calibration parameters. `PERSON_C_REPORT.md` contains the methodology draft and
-tracks the analyses that require actual experiment outputs.
+calibration parameters. `PERSON_C_REPORT.md` contains the completed Q2/Q4 report,
+including all ten case explanations and limitations. The committed run used
+Python 3.14.2; `requirements-person-c.txt` pins its dependency versions and can
+be installed instead of the general requirements for closer reproduction.
+
+Validation AUROC at 500/1,000/2,000/5,000/8,000 examples was
+0.890672 / 0.923734 / 0.947738 / 0.965055 / 0.971228; training AUROC was 1.0
+throughout. Short/medium/long validation AUROC was 0.958732 / 0.973797 / 0.983390.
+The full model made 50 false positives and 127 false negatives at margin 0.
+
+The original `run_word_char_improvement.py` also produced 0.971228 in this
+environment, matching the new script exactly. This differs by 0.000106 from
+the historical committed result 0.971122; the precise historical cause is not
+confirmed. Neither the validation split nor model configuration was changed.
+To reproduce that cross-check (the original script checks all four C values):
+
+```bash
+python run_word_char_improvement.py \
+  --train_csv /path/to/competition/train.csv \
+  --out person_c_results/original_script_reproduction.csv
+```
 
 ### AI assistance for Person C
 
-OpenAI Codex assisted with the Q2/Q4 experiment implementation and documentation.
-Split-integrity checks and a synthetic smoke check were performed during development.
-Actual competition metrics and qualitative error interpretations must be verified
-against the generated outputs before finalizing the report.
+OpenAI Codex assisted with Q2/Q4 implementation, experiment execution, inspection
+of the ten selected passages, qualitative hypotheses, and report drafting.
+Split-integrity checks, a synthetic smoke check, output consistency checks, and
+an independent rerun of the original model script were performed. The plot was
+visually inspected. Grace should review the interpretations and disclosure before
+including them in the final report; these checks do not claim human review.

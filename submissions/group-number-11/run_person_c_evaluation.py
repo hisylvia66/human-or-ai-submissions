@@ -59,7 +59,7 @@ def load_fixed_split(path):
     for values, expected in zip(ids, (8000, 2000)):
         if len(values) != expected or values.isna().any() or values.duplicated().any():
             raise ValueError("Invalid committed split IDs")
-    if set(ids[0]) & set(ids[1]) or set(ids[0]) | set(ids[1]) != set(data.id):
+    if (set(ids[0]) & set(ids[1])) or ((set(ids[0]) | set(ids[1])) != set(data.id)):
         raise ValueError("Committed split must partition the provided dataset exactly")
     data = data.set_index("id")
     tr, va = [data.loc[values].reset_index() for values in ids]
@@ -166,6 +166,12 @@ def main():
     if len(selected) != 10:
         raise ValueError("Fewer than five errors in one class; inspect full predictions")
     selected.to_csv(out / "selected_error_predictions.csv", index=False)
+    notes = json.loads((TEAM / "person_c_error_notes.json").read_text())
+    annotated = selected.copy()
+    for column in ("observed_pattern", "possible_reason"):
+        annotated[column] = [notes.get(str(i), {}).get(column, "REQUIRES TEXT REVIEW")
+                             for i in annotated.id]
+    annotated.to_csv(out / "error_analysis.csv", index=False)
     if args.review_text:
         args.review_text.parent.mkdir(parents=True, exist_ok=True)
         selected.merge(va[["id", "text"]], on="id").to_csv(args.review_text, index=False)
