@@ -3,14 +3,15 @@
   "prediction_sha256": "d2175afdd7dfe511b07c1e39230d23fc98324e15f6fecfab9c05464504a74ca2",
   "n_labeled": 10000,
   "n_predictions": 3000,
-  "public_score": null,
+  "public_score": 0.88628,
   "private_score": null,
-  "status": "Generated locally; not submitted",
+  "status": "Submitted; public score confirmed by user screenshot",
   "calibration_slope": 7.501555362910573,
   "calibration_intercept": 0.3189119630418254,
   "input_sha256": {
     "train.csv": "325e345faf88fb1c4203278098c282e40319a87b4bf17e094d2f235f51d0c07e",
     "test.csv": "02209fdb74607f6b5f09a43300ed74761edf76f161cf9fd579cf43fb213884cd",
     "sample_submission.csv": "2fdb037826ae4a83136c393fa9d29fd74d899b2dd06d32caadbe3a56e356193d"
-  }
+  },
+  "public_score_evidence": "User screenshot: submission_robust_blend.csv, Complete, Public Score 0.88628"
 }

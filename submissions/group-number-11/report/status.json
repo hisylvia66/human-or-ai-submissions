@@ -5,5 +5,11 @@
   "submission_status": "Submitted to Kaggle; public score confirmed",
   "confirmed_previous_submission": "submission_word_svm_c05.csv",
   "confirmed_previous_public_score": 0.85049,
-  "public_score_evidence": "User-provided Kaggle screenshot: submission.csv, Complete, public score 0.85994"
+  "public_score_evidence": "User-provided Kaggle screenshot: submission.csv, Complete, public score 0.85994",
+  "main_report_stage": "Historical NB refinement; newer stages are documented in appendices",
+  "latest_confirmed_submission": "submission_robust_blend.csv",
+  "latest_confirmed_public_score": 0.88628,
+  "neural_public_score": null,
+  "rank_blend_public_score": null,
+  "report_finalization_status": "Pending external scoring and final model selection"
 }

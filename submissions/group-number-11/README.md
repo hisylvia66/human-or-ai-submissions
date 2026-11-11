@@ -4,20 +4,20 @@ Yilin Gao (yg695), Yingzi Gu / Grace (yg667), Ansh Raj Bhargava (ab3396).
 Work on `submission/group-number-11`. All project changes belong in this team directory.
 
 Course draft PR: https://github.com/sekhari/human-or-ai-submissions/pull/13
-The PR remains a draft pending team review; the new-model public score is now recorded.
+The PR remains a draft pending new-candidate Kaggle scoring, final report selection and team review.
 
 
-## Post-submission independent review and next candidate
+## Latest submitted model and ongoing neural experiment
 
 After the confirmed **0.85994** public score, an independent review found marked
 format sensitivity and a large drop under training-only text-cluster holdout.
 See [PROJECT_REVIEW.md](PROJECT_REVIEW.md) for evidence, code limitations and all
 candidate results. The new fixed 75:25 NB/stylometry blend reaches **0.988136**
 on official validation and **0.945723** mean cluster-CV AUROC (old NB: **0.903318**).
-It improves all three held-out cluster folds, but has not yet been scored on Kaggle.
+It improves all three held-out cluster folds and scored **0.88628 on Kaggle**, confirmed by the user screenshot. This is a gain of 0.02634 over NB, but remains far below its fixed-validation score.
 
-The **next candidate** is `artifacts/submission_robust_blend.csv`. The previous
-`artifacts/submission.csv` remains the actually submitted NB model with 0.85994.
+The **latest submitted file** is `artifacts/submission_robust_blend.csv`. The previous
+`artifacts/submission.csv` remains the earlier submitted NB model with 0.85994.
 Do not confuse these files or transfer one model's score to the other.
 
 ```bash
@@ -30,12 +30,30 @@ python build_audit_report.py
 ```
 
 The report includes a post-submission audit appendix; its main Q0/Q4 still describe
-the model that was actually submitted. Promote the candidate and synchronize final
-Q4 only after confirming the next submission decision. Observed scores are retained
+the historical NB stage, while the appendix records the newer blend and its confirmed score. A local DeBERTa experiment is recorded; see `NEURAL_EXPERIMENT.md`. The final model/report will be synchronized after evaluating that experiment. Observed scores are retained
 only when prediction and input hashes match; changed predictions archive the old
 manifest instead of inheriting its leaderboard score.
 
-## Selected approach and submission status
+## Local neural refinement (not yet scored on Kaggle)
+
+Using the same 8,000/2,000 IDs, two-epoch local DeBERTa-v3-small fine-tuning
+reached **0.989423** validation AUROC. A single fixed 50:50 rank blend with the
+submitted NB/style model reached **0.994594**. These are local validation scores,
+not public scores. Checkpoint/candidate selection reuses the validation set.
+
+The new outputs are `artifacts/submission_deberta.csv` (pure neural) and
+`artifacts/submission_deberta_robust_rank50.csv` (fixed rank blend). See
+[NEURAL_EXPERIMENT.md](NEURAL_EXPERIMENT.md) for pinned weights, supervised-label
+restrictions, local training commands, diagnostics and limitations. The pure
+model's softmax values are uncalibrated; ensemble values are ranking scores.
+
+The report preserves earlier experiments and adds neural methods, subgroup
+results, ten inspected error cases and the pending-score status in an appendix.
+Run `build_report.py`, `build_audit_report.py`, and `build_neural_report.py` before
+compiling and packaging. Final course submission still requires choosing the
+final model and synchronizing Q0/Q4 after the new Kaggle result is known.
+
+## Earlier NB refinement (historical stage)
 
 The selected model is **NB-weighted word + character TF-IDF with LinearSVC(C=0.5)**.
 It was selected from six recorded candidates using the committed 8,000/2,000 split.
@@ -204,8 +222,7 @@ claimed as human review. Every member should review their contributions, claims
 and AI-use disclosure before final submission. No external LLM API predicted test
 labels and no hidden labels were retrieved.
 
-The new submission is complete: public AUROC **0.85994**, an increase of **0.00945**
+The earlier NB submission achieved public AUROC **0.85994**, an increase of **0.00945**
 over the earlier word-only submission (0.85049). This compares different full
-pipelines, not the isolated effect of NB weighting. Review the PDF and course PR,
-then submit the PDF and PR URL in the course portal. Private performance remains
+pipelines, not the isolated effect of NB weighting. The latest submitted blend scored **0.88628**; neural candidates have been generated and await Kaggle scoring before final report selection. Private performance remains
 unknown until Kaggle reveals it.

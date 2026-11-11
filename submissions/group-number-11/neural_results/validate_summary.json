@@ -1,0 +1,22 @@
+{
+  "model_id": "microsoft/deberta-v3-small",
+  "revision": "a36c739020e01763fe789b4b85e2df55d6180012",
+  "mode": "validate",
+  "device": "mps",
+  "n_train": 8000,
+  "n_validation": 2000,
+  "best_epoch": 2,
+  "validation_auroc": 0.9894230000000002,
+  "learning_rate": 3e-05,
+  "batch_size": 16,
+  "accumulation": 2,
+  "max_length": 256,
+  "precision": "bf16",
+  "freeze_embeddings": true,
+  "seed": 42,
+  "whitespace_normalization": true,
+  "elapsed_seconds": 1272.0909351250157,
+  "torch_version": "2.10.0",
+  "transformers_version": "4.57.6",
+  "train_csv_sha256": "325e345faf88fb1c4203278098c282e40319a87b4bf17e094d2f235f51d0c07e"
+}

@@ -1,0 +1,24 @@
+{
+  "selected_epoch": 2,
+  "validation_auroc": 0.9894230000000002,
+  "submitted_blend_validation_auroc": 0.988136,
+  "delta_vs_submitted_blend": 0.0012870000000001491,
+  "paired_bootstrap_95ci_conditional_on_selection": [
+    -0.003095062380249322,
+    0.005289464194737728
+  ],
+  "confusion_matrix_at_logit_zero": [
+    [
+      796,
+      204
+    ],
+    [
+      18,
+      982
+    ]
+  ],
+  "uncalibrated_probability_brier_score": 0.08813912049761818,
+  "public_score": null,
+  "private_score": null,
+  "limitations": "Same validation set selects epoch; interval is descriptive, not independent confirmation. Softmax probabilities are not calibrated. Kaggle generalization remains unknown."
+}

@@ -1,0 +1,9 @@
+{
+  "validation_auroc": 0.9945935,
+  "delta_vs_submitted_blend": 0.006457500000000005,
+  "paired_bootstrap_95ci_conditional_on_selection": [
+    0.00408868350588977,
+    0.008688363865945034
+  ],
+  "limitations": "Exploratory reused holdout; bootstrap keeps fitted empirical-rank transform fixed. No public score inferred."
+}

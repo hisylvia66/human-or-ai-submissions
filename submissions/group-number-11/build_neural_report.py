@@ -1,0 +1,81 @@
+"""Generate a separately identified local-neural experiment appendix."""
+import json
+from pathlib import Path
+import pandas as pd
+T=Path(__file__).resolve().parent;O=T/'neural_results';R=T/'report'
+s=json.loads((O/'validate_summary.json').read_text())
+e=json.loads((O/'evaluation.json').read_text())
+c=pd.read_csv(O/'candidate_comparison.csv')
+rows='\n'.join(name.replace('_',r'\_')+f' & {auc:.6f} '+r'\\' for name,auc in zip(c.model,c.validation_auroc))
+epochs=pd.read_csv(O/'validate_epochs.csv')
+epoch_text='; '.join(f"epoch {int(x.epoch)}: {x.validation_auroc:.6f}" for x in epochs.itertuples())
+diagnostics=''
+if (O/'diagnostics.json').exists():
+    d=json.loads((O/'diagnostics.json').read_text())
+    diagnostics=(f"Selected-checkpoint training AUROC is {d['train_auroc']:.6f}; validation AUROC is {d['validation_auroc']:.6f}. "
+                 f"Normalizing Unicode, quotation marks and whitespace in both classes gives {d['format_normalized_validation_auroc']:.6f}; "
+                 f"also removing punctuation gives {d['punctuation_removed_validation_auroc']:.6f}. These are synthetic stress tests, not measured hidden-test conditions.")
+tex=r'''\newpage
+\begingroup\small\setlength{\emergencystretch}{2em}
+\section*{Local neural refinement: candidate awaiting Kaggle evaluation}
+\textbf{Status.} The latest confirmed public AUROC is 0.88628 for the NB/style blend. The following neural candidates have no measured public or private score. Neither a high fixed-validation score nor model pretraining establishes a public AUROC of 0.98--0.99.
+
+\subsection*{Hypothesis and experimental protocol}
+After observing the validation/public gap, we tested whether contextual pretrained representations could complement local n-grams and stylistic statistics. We used Microsoft's general-purpose \href{https://huggingface.co/microsoft/deberta-v3-small}{DeBERTa-v3-small}, following \href{https://arxiv.org/abs/2111.09543}{DeBERTaV3 (He et al.)}. The exact weight revision is recorded in \texttt{neural\_results/pretrained\_source.json}. Pretraining is external general-language training; the only supervised labels in our fine-tuning are the supplied competition labels. All training and prediction run locally, with no external inference API or hidden labels.
+
+Training uses the same 8,000 training IDs and evaluates the same 2,000 validation IDs. We normalize whitespace, truncate to 256 tokens, freeze pretrained embeddings, and fine-tune the encoder and new classification head. Settings: AdamW, learning rate $3\times10^{-5}$, weight decay 0.01, batch 16, accumulation 2, 10\% linear warmup followed by linear decay, gradient clipping at 1, seed 42, bfloat16 on Apple MPS, two epochs. We retain the better validation checkpoint. Validation labels select the epoch but never enter gradient updates. Test labels are unavailable.
+
+\subsection*{Measured local results}
+'''+epoch_text+f". Selected epoch: {s['best_epoch']}. Validation-run time (including evaluation and checkpointing): {s['elapsed_seconds']/60:.1f} minutes.\n\n"+r'''
+\par\noindent
+\begin{tabularx}{\linewidth}{@{}Yr@{}}\toprule
+Model & Fixed-validation AUROC\\\midrule
+'''+rows+r'''
+\bottomrule\end{tabularx}\par
+
+We also test one fixed 50:50 mean-percentile-rank blend of the neural scores and the previously submitted NB/style scores; there is no weight sweep. Ranks are computed separately within validation and test predictions without labels. These ensemble outputs are ranking scores, not calibrated probabilities. Checkpoint and candidate selection reuse the holdout; all comparisons are exploratory.
+
+'''+diagnostics+r'''
+
+\subsection*{Limitations and submission procedure}
+About 50.5\% of validation texts exceed 256 tokens, so truncation discards potentially useful evidence. A 384-token limit would truncate 8.4\%, but that configuration has not been trained in this experiment. Neural softmax outputs are uncalibrated. Epoch selection and repeated reuse of validation may inflate apparent gains. The existing distribution gap remains unresolved until external scoring; no public improvement is asserted.
+
+The final neural candidate is retrained from the pinned pretrained weights on all 10,000 supplied labeled rows using the chosen epoch count and training settings. Its file is \path{artifacts/submission_deberta.csv}; the fixed ensemble is \path{artifacts/submission_deberta_robust_rank50.csv}. Prediction hashes and input hashes are recorded separately, so earlier leaderboard scores cannot transfer to new predictions. See \texttt{NEURAL\_EXPERIMENT.md} for reproduction and limitations. Both candidates need actual Kaggle evaluation before final report selection.
+\endgroup
+'''
+groups=pd.read_csv(O/'length_group_comparison.csv')
+group_rows='\n'.join(f'{r.length_group.title()} & {r.n} & {r.validation_auroc:.6f} & {r.submitted_blend_auroc:.6f} '+r'\\' for r in groups.itertuples())
+errors=pd.read_csv(O/'error_analysis.csv')
+if errors.possible_reason.str.contains('REQUIRES TEXT REVIEW').any():
+    raise ValueError('Inspect new neural errors and update neural_error_notes.json first')
+from build_report import esc
+error_rows='\n'.join(f'{r.id} & {r.error_type} & {r.p_ai_uncalibrated:.6f} & '+esc(r.possible_reason)+r'\\' for r in errors.itertuples())
+tex+=r'''\newpage
+\begingroup\small\setlength{\emergencystretch}{2em}
+\section*{Neural candidate: subgroup and error diagnostics}
+The same training-derived word-count boundaries (175 and 240 words) define short, medium and long validation groups. AUROC evaluates ranking; the neural classifier's default logit-zero rule corresponds to an uncalibrated softmax value of 0.5.
+\par\noindent
+\begin{tabularx}{\linewidth}{@{}Yrrr@{}}\toprule
+Length group & Count & Neural AUROC & Submitted blend\\\midrule
+'''+group_rows+r'''
+\bottomrule\end{tabularx}\par
+At the default threshold, the neural model produces 204 false positives and 18 false negatives (88.9\% accuracy). Its high AUROC does not imply a good operating threshold or calibrated probabilities. No validation-optimized threshold is presented as an unbiased test result.
+
+\subsection*{Five false positives and five false negatives}
+These are the most confident errors of each type at the default threshold. They are selected examples, not a representative prevalence estimate. Passage inspection supports the following hypotheses; it does not establish causal feature attribution or that supplied labels are incorrect.
+\par\noindent
+\begin{tabularx}{\linewidth}{@{}rrrY@{}}\toprule
+ID & Type & Softmax AI & Possible reason from inspected passage\\\midrule
+'''+error_rows+r'''
+\bottomrule\end{tabularx}\par
+Human research abstracts and structured explanations account for several confident false positives. Recipes, informal reviews and detailed biographies still produce false negatives. These genres occur in both classes. A next controlled experiment could compare 256 versus 384 tokens while retaining the same training/validation IDs; this would test whether later evidence helps rather than assuming truncation caused these errors. More representative held-out domains and probability calibration deserve separate evaluation.
+\endgroup
+'''
+refit_path=O/'refit_summary.json'
+if refit_path.exists():
+    refit=json.loads(refit_path.read_text())
+    tex=tex.replace('Both candidates need actual Kaggle evaluation before final report selection.', f"Full-data refit and test inference took {refit['elapsed_seconds']/60:.1f} minutes. Both candidates need actual Kaggle evaluation before final report selection.")
+cm=e['confusion_matrix_at_logit_zero']
+tex=tex.replace('204 false positives and 18 false negatives (88.9\\% accuracy)', f'{cm[0][1]} false positives and {cm[1][0]} false negatives ({100*(cm[0][0]+cm[1][1])/sum(map(sum,cm)):.1f}\\% accuracy)')
+(R/'neural_appendix.tex').write_text(tex)
+print('Generated neural appendix from saved results.')

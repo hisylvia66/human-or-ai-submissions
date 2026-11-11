@@ -20,7 +20,7 @@
     175.0,
     240.0
   ],
-  "public_score": null,
+  "public_score": 0.88628,
   "private_score": null,
   "selection_rule": "Best mean topic-held-out AUROC among candidates with fixed-validation AUROC >= 0.977012",
   "evaluation_seconds": 44.866522499360144

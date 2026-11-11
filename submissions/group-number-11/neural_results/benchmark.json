@@ -1,0 +1,9 @@
+{
+  "device": "mps",
+  "steps": 12,
+  "elapsed_seconds": 19.5553310001269,
+  "batch_size": 16,
+  "max_length": 384,
+  "precision": "bf16",
+  "freeze_embeddings": true
+}

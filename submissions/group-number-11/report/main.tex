@@ -52,12 +52,13 @@
 \vspace{0.2in}
 {\Huge\bfseries\color{navy} Human or AI?}\par
 \vspace{0.08in}
-{\LARGE\color{navy} Group 11: Final Project Report}\par
+{\LARGE\color{navy} Group 11: Project Report}\par
 \vspace{0.2in}
 \textbf{Kaggle team:} Group Number 11\par
 \textbf{Course GitHub PR:} \PRLink\par
 \textbf{Branch:} \texttt{submission/group-number-11}\par
-\textbf{Submission status:} \SubmissionStatus\par
+\textbf{Submission status (NB stage):} \SubmissionStatus\par
+\smallnote{Working report: Q0--Q5 preserve the NB-stage analysis. The audit appendix records the subsequent blend submission (public AUROC 0.88628). The neural appendix records local refinement; its new Kaggle scores remain pending. Final selection remains under review.}
 
 \section*{Q0. Team information and model summary}
 \question{Q0.1.}{Team members and main contributions.}
@@ -200,4 +201,5 @@ The final prediction file is \texttt{artifacts/submission.csv}. See README for Q
 \question{Q6.3.}{AI assistance and verification.}
 Codex assisted Grace with code, execution, debugging, passage inspection, hypotheses and LaTeX drafting. Automated checks validate split membership, metrics, calibration, IDs and submission hashes; the rendered PDF was visually checked. These are not claims of human review. Each member should review the report, understand the approach and confirm their own tool disclosure before submission. Results are measured, failure explanations are hypotheses, and unknown Kaggle scores remain unfilled. No external LLM API predicted test labels and no hidden labels were retrieved.
 \input{audit_appendix.tex}
+\input{neural_appendix.tex}
 \end{document}
