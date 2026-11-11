@@ -1,25 +1,11 @@
-# Group 11 report
+# Group 11 final report
 
-Upload the standalone `group11_overleaf.zip` as a new Overleaf project. Set
-`main.tex` as the main document and use pdfLaTeX (two passes for references).
-All required tables and the learning-curve PDF are included.
+Final selection: pure DeBERTa-v3-small, fixed-validation AUROC 0.989423 and confirmed public AUROC 0.92433. The rank blend (0.92164) and robustness continuation (0.91085) were not selected. Private scores remain unknown.
 
-The report follows Q0–Q6 in the course template, omitting the blank instructions
-and rubric pages. No source passages or competition datasets are included.
+Team: Ansh Raj Bhargava (ab3396), Yilin Gao (yg695), Yingzi Gu (yg667).
 
-The main report documents the historical NB stage: NB-weighted word/character TF-IDF + LinearSVC C=0.5,
-validation AUROC 0.977012 and screenshot-confirmed Kaggle public AUROC 0.85994.
-The audit appendix records the newer NB/style blend: validation 0.988136 and confirmed public score 0.88628. The neural appendix records validation AUROC 0.989423 (DeBERTa) and 0.994594 (fixed rank blend), with confirmed public scores 0.92433 and 0.92164, respectively. This is a working report, not yet the final model selection.
-Private AUROC is not yet available. The older word-only model scored 0.85049.
+The report follows Q0–Q6 in the supplied template. Q2 and Q3 retain classical controlled experiments; Q4 evaluates the selected neural model. Appendices explain the distribution audit, neural method and failed continuation. No raw passages or competition data are included.
 
-In the repository, edit `report/status.json`, run `python build_report.py`, `python build_audit_report.py`, and
-`python build_neural_report.py`, and `python build_last_refinement_report.py`, compile
-`report/main.tex` and run `python package_report.py`. Tables and macros are derived
-from saved experiments. In Overleaf alone, update the public/private score macros
-and submission status in `metrics.tex` only after the matching submission is scored,
-and sync those edits back to the repository's status JSON afterward.
+From the team directory, run `build_report.py`, `build_audit_report.py`, `build_neural_report.py`, and `build_last_refinement_report.py`, then compile `report/main.tex` with Tectonic and run `package_report.py`. The latter updates `report/report.pdf` and creates `artifacts/group11_overleaf.zip`. Upload that standalone ZIP to Overleaf, choose `main.tex` and pdfLaTeX. All sources and figures are included.
 
-Review the contribution table, AI-use disclosure, and interpretation with all team
-members before course submission. The current disclosure does not assert that
-human review has already occurred. Private score should remain unavailable until
-Kaggle reveals it. The GitHub PR link must point to the course repository PR.
+The course submission link is https://github.com/sekhari/human-or-ai-submissions/pull/13 and appears on the title page. `status.json` distinguishes final selection from the latest chronological submission. Confirmed scores are associated with recorded prediction hashes. Automated checks and visual PDF review do not assert completed human review of contributions or disclosures.

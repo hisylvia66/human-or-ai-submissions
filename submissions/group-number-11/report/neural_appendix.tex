@@ -1,6 +1,6 @@
 \newpage
 \begingroup\small\setlength{\emergencystretch}{2em}
-\section*{Local neural refinement: measured Kaggle results}
+\section*{Final DeBERTa model: method and measured results}
 \textbf{Status.} The pure neural model scored 0.92433 publicly; the fixed neural/NB-style rank blend scored 0.92164. Both improved on the earlier NB/style blend (0.88628), but the locally better rank blend was worse publicly. Private scores remain unknown.
 
 \subsection*{Hypothesis and experimental protocol}
@@ -25,9 +25,9 @@ We also test one fixed 50:50 mean-percentile-rank blend of the neural scores and
 Selected-checkpoint training AUROC is 0.995930; validation AUROC is 0.989423. Normalizing Unicode, quotation marks and whitespace in both classes gives 0.989299; also removing punctuation gives 0.980220. These are synthetic stress tests, not measured hidden-test conditions.
 
 \subsection*{Limitations and submission procedure}
-About 50.5\% of validation texts exceed 256 tokens, so truncation discards potentially useful evidence. A 384-token limit would truncate 8.4\%, but that configuration has not been trained in this experiment. Neural softmax outputs are uncalibrated. Epoch selection and repeated reuse of validation may inflate apparent gains. The observed public scores remain below validation scores, showing that the distribution gap persists.
+About 50.5\% of validation texts exceed 256 tokens, so truncation discards potentially useful evidence. A 384-token limit would truncate 8.4\%, but the later combined robustness experiment changes several factors and does not isolate context length. Neural softmax outputs are uncalibrated. Epoch selection and repeated reuse of validation may inflate apparent gains. The observed public scores remain below validation scores, showing that the distribution gap persists.
 
-The final neural candidate is retrained from the pinned pretrained weights on all 10,000 supplied labeled rows using the chosen epoch count and training settings. Its file is \path{artifacts/submission_deberta.csv}; the fixed ensemble is \path{artifacts/submission_deberta_robust_rank50.csv}. Prediction hashes and input hashes are recorded separately, so earlier leaderboard scores cannot transfer to new predictions. See \texttt{NEURAL\_EXPERIMENT.md} for reproduction and limitations. Full-data refit and test inference took 30.3 minutes. The public results motivate a separate robustness continuation, documented in the next appendix.
+The final neural candidate is retrained from the pinned pretrained weights on all 10,000 supplied labeled rows using the chosen epoch count and training settings. Its file is \path{artifacts/submission_deberta.csv}; the fixed ensemble is \path{artifacts/submission_deberta_robust_rank50.csv}. Prediction hashes and input hashes are recorded separately, so earlier leaderboard scores cannot transfer to new predictions. See \texttt{NEURAL\_EXPERIMENT.md} for reproduction and limitations. Full-data refit and test inference took 30.3 minutes. The later robustness continuation scored 0.91085 and was rejected; the original pure model remains the final selection.
 \endgroup
 \newpage
 \begingroup\small\setlength{\emergencystretch}{2em}

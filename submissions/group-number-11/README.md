@@ -1,166 +1,89 @@
-# Group Number 11 — Human or AI?
+# Group 11 — Human or AI?
 
-Yilin Gao (yg695), Yingzi Gu / Grace (yg667), Ansh Raj Bhargava (ab3396).
-Work on `submission/group-number-11`. All project changes belong in this team directory.
+| Team member | NetID | Main contributions |
+|---|---|---|
+| Ansh Raj Bhargava | ab3396 | Q3 self-training and Q5 robustness experiments |
+| Yilin Gao | yg695 | Q1 pipeline, model comparison, tuning and shared split |
+| Yingzi Gu | yg667 | Q2/Q4, later model refinement, reproducibility and report integration |
 
-Course draft PR: https://github.com/sekhari/human-or-ai-submissions/pull/13
-The PR remains a draft pending the final robustness candidate score, report selection and team review.
+## Final deliverables
 
+- **Final model: DeBERTa-v3-small**, public AUROC **0.92433**; fixed-validation AUROC **0.989423**. Private score is unknown.
+- [Final report PDF](report/report.pdf) · [LaTeX source](report/main.tex)
+- [Team branch and folder](https://github.com/hisylvia66/human-or-ai-submissions/tree/submission/group-number-11/submissions/group-number-11)
+- [Course submission PR #13](https://github.com/sekhari/human-or-ai-submissions/pull/13)
+- Selected Kaggle file: `artifacts/submission_deberta.csv`, generated locally and excluded from Git. Its exact prediction hash and confirmed score are in [the manifest](neural_results/refit_summary.json).
 
-## Latest submitted model and ongoing neural experiment
+All project changes are in `submissions/group-number-11/`, on branch `submission/group-number-11`. The repository preserves experiments and negative results; historical script names containing `final` refer to the earlier NB stage, not the selected neural model.
 
-After the confirmed **0.85994** public score, an independent review found marked
-format sensitivity and a large drop under training-only text-cluster holdout.
-See [PROJECT_REVIEW.md](PROJECT_REVIEW.md) for evidence, code limitations and all
-candidate results. The new fixed 75:25 NB/stylometry blend reaches **0.988136**
-on official validation and **0.945723** mean cluster-CV AUROC (old NB: **0.903318**).
-It improves all three held-out cluster folds and scored **0.88628 on Kaggle**, confirmed by the user screenshot. This is a gain of 0.02634 over NB, but remains far below its fixed-validation score.
+## Confirmed submissions
 
-The **latest submitted file** is `artifacts/submission_robust_blend.csv`. The previous
-`artifacts/submission.csv` remains the earlier submitted NB model with 0.85994.
-Do not confuse these files or transfer one model's score to the other.
+| File | Model | Kaggle public AUROC |
+|---|---|---:|
+| `submission_word_svm_c05.csv` | Word SVM | 0.85049 |
+| `submission.csv` | NB-weighted word/character SVM | 0.85994 |
+| `submission_robust_blend.csv` | NB/stylometry blend | 0.88628 |
+| `submission_deberta_robust_rank50.csv` | Neural/classical rank blend | 0.92164 |
+| **`submission_deberta.csv`** | **Pure DeBERTa (selected)** | **0.92433** |
+| `submission_final_robust_neural.csv` | Robust neural continuation (rejected) | 0.91085 |
+
+All scores above were confirmed by user-provided Kaggle screenshots. The earlier team-message score 0.87240 was not confirmed and is not used. Best-public selection reuses leaderboard feedback; neither public nor reused validation performance is an untouched estimate of private-test performance.
+
+The rank blend had higher local validation AUROC (0.994594) but lower public performance than pure DeBERTa. The last continuation improved three synthetic stress tests but reduced public AUROC by 0.01348. Its final fitting budget was shorter than its development run; preprocessing, augmentation and context also changed. We do not attribute its failure to a single cause. Details: [neural experiment](NEURAL_EXPERIMENT.md), [rejected continuation](FINAL_REFINEMENT.md), [earlier distribution audit](PROJECT_REVIEW.md).
+
+## Setup and selected-model reproduction
+
+Run all commands from this directory. Place the supplied `train.csv`, `unlabeled.csv`, `test.csv` and `sample_submission.csv` in `data/competition/`. Do not commit data, full passage excerpts, credentials, caches or weights. The fixed split is committed as `train_ids.csv` (8,000) and `validation_ids.csv` (2,000); never create a replacement split.
+
+The recorded neural environment is Python 3.14.2, PyTorch 2.10.0, Transformers 4.57.6, local Apple MPS and bfloat16. Dependencies are pinned in `requirements-neural.txt`. CPU fallback is slower; use FP32 if the backend lacks bfloat16 and record the changed configuration. GPU and environment differences can affect numerical reproduction.
 
 ```bash
-python audit_project.py --data_dir data/competition
-python run_robustness_audit.py --data_dir data/competition
-python run_iid_audit_control.py --data_dir data/competition
-python generate_audit_candidate.py --data_dir data/competition
-python verify_audit_results.py --data_dir data/competition
-python build_audit_report.py
+python -m pip install -r requirements-neural.txt
+python download_pretrained.py
+python train_neural.py --data_dir data/competition --mode validate \
+  --epochs 2 --batch_size 16 --accumulation 2 --max_length 256 \
+  --learning_rate 0.00003 --precision bf16 --freeze_embeddings
+python evaluate_neural.py
+python diagnose_neural.py --data_dir data/competition
+python train_neural.py --data_dir data/competition --mode refit
+python verify_neural_results.py --data_dir data/competition
+python export_selected_submission.py
 ```
 
-The report includes a post-submission audit appendix; its main Q0/Q4 still describe
-the historical NB stage, while the appendix records the newer blend and its confirmed score. A local DeBERTa experiment is recorded; see `NEURAL_EXPERIMENT.md`. The final model/report will be synchronized after evaluating that experiment. Observed scores are retained
-only when prediction and input hashes match; changed predictions archive the old
-manifest instead of inheriting its leaderboard score.
+The downloader pins general-language pretrained weights to revision `a36c739020e01763fe789b4b85e2df55d6180012`. Supervised fine-tuning uses only competition labels. Development and full-data refit start independently from the original pretrained model; the all-label checkpoint is never used to evaluate the overlapping validation rows. The chosen epoch count is two. Whitespace normalization, first-256-token truncation and uncalibrated softmax scores are used. No pseudo-labels or ensemble enter the final selection. See `NEURAL_EXPERIMENT.md` for exact optimizer settings, timings and limitations.
 
-## Local neural refinement and confirmed public scores
+Reproduction creates `artifacts/submission_deberta.csv`. The export command verifies its manifest and writes the identical bytes to **`artifacts/final_submission/submission.csv`**, satisfying the course filename without overwriting the historical NB file. Confirmed scores belong to the recorded prediction hashes, not automatically to newly regenerated files; changed predictions archive prior scored manifests. No hidden labels or external prediction APIs are used.
 
-Using the same 8,000/2,000 IDs, two-epoch local DeBERTa-v3-small fine-tuning
-reached **0.989423** validation AUROC. A single fixed 50:50 rank blend with the
-submitted NB/style model reached **0.994594**. These are local validation scores. The corresponding confirmed public scores are
-**0.92433** (pure neural) and **0.92164** (rank blend). Checkpoint/candidate selection
-reuses the validation set; the public ordering is reversed.
+## Required experiments and evidence
 
-The new outputs are `artifacts/submission_deberta.csv` (pure neural) and
-`artifacts/submission_deberta_robust_rank50.csv` (fixed rank blend). See
-[NEURAL_EXPERIMENT.md](NEURAL_EXPERIMENT.md) for pinned weights, supervised-label
-restrictions, local training commands, diagnostics and limitations. The pure
-model's softmax values are uncalibrated; ensemble values are ranking scores.
+Q2 and Q3 deliberately retain classical configurations for controlled experiments; they are not neural learning curves or neural self-training results. Q4 in the final report evaluates the selected neural development checkpoint, including training/validation AUROC, three length groups and five FP/five FN with uncalibrated P(AI) and inspected hypotheses.
 
-The report preserves earlier experiments and adds neural methods, subgroup
-results, ten inspected error cases and the pending-score status in an appendix.
-Run `build_report.py`, `build_audit_report.py`, and `build_neural_report.py` before
-compiling and packaging. A final one-hour robustness continuation is described in
-[FINAL_REFINEMENT.md](FINAL_REFINEMENT.md). Final course submission still requires
-confirming the last candidate score and synchronizing the final report selection.
+| Question/stage | Code | Recorded evidence |
+|---|---|---|
+| Q1 comparison/tuning | `run_model_comparison.py`, `run_hyperparameter_tuning.py` | `final_results/q1_*.csv` |
+| Q2 fixed-model learning curve | `run_person_c_evaluation.py` | `person_c_results/`, nested subset IDs and plot |
+| Q3 unlabeled data | `run_unlabeled_experiment.py` | `unlabeled_*` files, historical teammate run |
+| Q4 selected DeBERTa | `evaluate_neural.py`, `diagnose_neural.py` | `neural_results/`, `neural_error_notes.json` |
+| Q5 original robustness | `run_robustness_improvement.py` | `robustness_*` files |
+| NB refinement | `run_final_refinement.py`, `evaluate_final_model.py` | `final_results/` |
+| Distribution audit/blend | `run_robustness_audit.py`, `run_iid_audit_control.py` | `audit_results/` |
+| Neural and fixed rank blend | `train_neural.py`, `compare_neural_candidates.py` | `neural_results/` |
+| Rejected continuation | `run_last_refinement.py`, `select_last_refinement.py` | `last_refinement_results/` |
 
-## Earlier NB refinement (historical stage)
-
-The selected model is **NB-weighted word + character TF-IDF with LinearSVC(C=0.5)**.
-It was selected from six recorded candidates using the committed 8,000/2,000 split.
-
-- Final validation AUROC: **0.977012**; training AUROC: **0.999964**.
-- Original word + character SVM baseline in the same environment: **0.971228**.
-- Improvement: **0.005784**. The descriptive paired bootstrap interval is
-  [0.001478, 0.010103]; it is conditional on selection, not multiplicity-adjusted.
-- Final Kaggle predictions are generated locally at `artifacts/submission.csv`.
-  The submitted new model achieved **public AUROC 0.85994**, confirmed by the user-provided Kaggle screenshot. Private AUROC remains unknown.
-- The screenshot-confirmed previous public score is **0.85049**, for
-  `submission_word_svm_c05.csv`. The earlier team message's 0.87240 is unverified
-  and is not reported as the final model's score.
-
-The NB weighting is inspired by [Wang and Manning (ACL 2012)](https://aclanthology.org/P12-2018/), adapted here to word/character TF-IDF.
-
-The final model estimates smoothed class log-count ratios from binary training
-feature occurrences, multiplies TF-IDF by those ratios, then fits the SVM. Word
-features are 1–2 grams (100,000 cap); character features are 3–5 grams (150,000 cap).
-Both use min_df=2, sublinear TF and default L2 normalization. Output probabilities
-come from a logistic sigmoid fitted to full-pipeline 3-fold out-of-fold training
-margins. Feature vocabularies, IDF and supervised weights are refit per fold.
-The final Kaggle fit uses all 10,000 labeled rows. The selected model does not use
-unlabeled examples, though Q3 tests their value.
-
-## Install and data
-
-The recorded environment is Python **3.14.2**. Exact direct dependencies are pinned:
+Classical reproduction uses `requirements-final.txt`:
 
 ```bash
-cd submissions/group-number-11
 python -m pip install -r requirements-final.txt
-```
-
-Place the supplied files in `data/competition/`:
-`train.csv`, `unlabeled.csv`, `test.csv`, `sample_submission.csv`.
-Do not commit competition data, full passage excerpts, credentials or model weights.
-Existing `requirements.txt` is the unpinned dependency list for earlier experiments.
-
-## Reproduce final selection, evaluation and predictions
-
-Run from this team directory:
-
-```bash
+python run_model_comparison.py --train_csv data/competition/train.csv --out final_results/q1_model_comparison.csv
+python run_hyperparameter_tuning.py --train_csv data/competition/train.csv --out final_results/q1_hyperparameter_tuning.csv
+python run_person_c_evaluation.py --train_csv data/competition/train.csv --review_text data/person_c_error_review.csv
 python run_final_refinement.py --data_dir data/competition
 python evaluate_final_model.py --data_dir data/competition
 python generate_final_submission.py --data_dir data/competition
 python verify_final_results.py --data_dir data/competition
 ```
 
-`final_model.py` is shared by all three workflows, so the evaluated and submitted
-configurations are identical. `run_final_refinement.py` never reads test data.
-It compares baseline, character weight 2, character-only, logistic regression C=5,
-NB weighting and two-round self-training. Selection is highest validation AUROC,
-with fit time breaking exact ties. Reusing the holdout for multiple experiments
-can make the selected score optimistic. No public leaderboard result guided selection.
-
-`final_results/` contains candidate metrics and scores, selected configuration,
-input hashes, duplicate checks, final Q4 groups/errors, and the submission manifest.
-`evaluate_final_model.py` verifies that its independently refitted margins match
-those from selection. Error case annotations live in `final_error_notes.json`;
-newly selected IDs are marked for text review rather than automatically invented.
-The local review text is saved in ignored `data/final_error_review.csv`.
-
-Final errors use SVM margin > 0, equivalent to calibrated P(AI) > **0.529366** in
-this validation fit. The sigmoid preserves ranking and does not guarantee perfectly
-calibrated probabilities. Five most-confident errors per class are inspected;
-this purposive sample is not representative of all errors.
-
-## Reproduce required experiments
-
-### Q1: model comparison and tuning
-
-These scripts now read the committed IDs instead of reconstructing a random split.
-The original root-level result CSVs preserve earlier teammate runs. The report
-uses the current-environment reruns under `final_results/` for Q1.
-
-```bash
-python run_model_comparison.py --train_csv data/competition/train.csv --out final_results/q1_model_comparison.csv
-python run_hyperparameter_tuning.py --train_csv data/competition/train.csv --out final_results/q1_hyperparameter_tuning.csv
-python run_word_char_improvement.py --train_csv data/competition/train.csv --out artifacts/word_char_replay.csv
-```
-
-The older `run_baseline.py` is retained as initial development history and takes
-`--zip`; use the commands above for the final fixed-ID evaluation workflow.
-
-### Q2: learning curve; historical supervised Q4
-
-```bash
-python run_person_c_evaluation.py --train_csv data/competition/train.csv --review_text data/person_c_error_review.csv
-```
-
-This preserves the original supervised word + character model at five balanced,
-nested sample sizes (500/1,000/2,000/5,000/8,000; seed 42). Each size refits TF-IDF.
-Validation AUROC is 0.890672 / 0.923734 / 0.947738 / 0.965055 / 0.971228.
-The PNG/PDF plot, metrics and subset IDs are in `person_c_results/`.
-Q2 is deliberately held fixed; final-model Q4 is separately rerun by
-`evaluate_final_model.py`. `PERSON_C_REPORT.md` is historical baseline analysis;
-use the integrated LaTeX report for the current final model.
-
-### Q3/Q5: Person B's original experiments
-
-The committed `unlabeled_*` and `robustness_*` files are Person B's recorded Kaggle
-runs. To reproduce without replacing that historical evidence, run in an ignored
-output directory (the scripts write several files to the working directory):
+The last four commands reproduce the **historical NB model**, not the final selected Kaggle model. They preserve its metrics and Q4 comparisons. Q2 sizes are 500/1,000/2,000/5,000/8,000, with unchanged word/character SVM settings and the same validation IDs. Its nested subsets use seed 42; each refits TF-IDF. Q3/Q5 original experiments write to the working directory, so replay them separately:
 
 ```bash
 mkdir -p artifacts/replay_q3 artifacts/replay_q5
@@ -168,63 +91,27 @@ mkdir -p artifacts/replay_q3 artifacts/replay_q5
 (cd artifacts/replay_q5 && python ../../run_robustness_improvement.py --data_dir ../../data/competition)
 ```
 
-The report labels these runs separately because the historical dependency versions
-were not pinned. Their baseline is 0.971122 versus the current 0.971228. Results may
-vary slightly with software versions. The existing Kaggle/Colab notebook
-`person_b_experiments.ipynb` is also retained.
+Historical teammate versions were not pinned, so small numerical differences are possible. Person B's original calibration shares a training-only feature vocabulary across folds; the revised NB-stage self-training refits full pipelines per fold. The report distinguishes them. Initial scripts/notebooks and result files are retained as experimental history, not competing final entrypoints.
 
-Person B's calibration uses out-of-fold SVM margins with features shared within
-the training partition. The final-refinement self-training candidate instead
-refits full feature pipelines per fold and freezes its initial training-only
-sigmoid across rounds. The two procedures are intentionally not presented as exact
-replications. Both exclude the fixed validation set from fitting. Q3's historical
-best was 0.972232; the revised candidate obtained 0.972186. Q5 normalization and
-augmentation did not improve original-validation performance; negative results
-are retained and explained. Synthetic robustness scores do not represent known
-hidden-test subgroup scores.
+For the audit and rejected continuation, use `PROJECT_REVIEW.md` and `FINAL_REFINEMENT.md`. `compare_neural_candidates.py` additionally requires the historical blend predictions; it is optional for reproducing the selected pure model.
 
-`generate_submission.py` and `run_robustness_improvement.py --submit R2` are legacy
-submission routes for earlier models. **Use `generate_final_submission.py` for
-the currently selected model.**
-
-## LaTeX report and Overleaf
-
-`report/main.tex` follows every Q0–Q6 question in the supplied template. Its tables
-and numeric macros are generated from result files, not manually copied scores.
+## Build PDF and standalone Overleaf project
 
 ```bash
 python build_report.py
+python build_audit_report.py
+python build_neural_report.py
+python build_last_refinement_report.py
 tectonic --keep-logs --outdir artifacts/report report/main.tex
 python package_report.py
 ```
 
-Tectonic is a separate system tool (not a pip dependency). On Overleaf, upload
-`artifacts/group11_overleaf.zip`, select `main.tex`, and use pdfLaTeX. The package
-script also copies the compiled PDF to `report/report.pdf`. The ZIP is standalone:
-all tables and the learning curve are included, with no competition data.
+Tectonic is a separate system dependency. The package command updates the versioned `report/report.pdf` and creates local `artifacts/group11_overleaf.zip`. Upload that ZIP to Overleaf, select `main.tex`, and compile with pdfLaTeX. Every table and figure is included. Do not upload the entire repository to Overleaf.
 
-After submitting `artifacts/submission.csv` to Kaggle, update the actual
-`public_score` and `submission_status` in `report/status.json`, then regenerate,
-compile and package the report. Leave private score null until it is revealed.
-The GitHub PR URL is also stored in that status file. Never substitute an older
-model's public score for the new model's score.
+`report/status.json` records the selected model, all latest confirmed statuses and exact team names. The report retains historical required experiments but uses DeBERTa consistently in the final summary, Q4 and final prediction instructions. The rejected continuation's actual 0.91085 is included; private scores remain null.
 
-## Verification, history and disclosure
+## Verification and disclosure
 
-`verify_final_results.py` checks IDs, nested training-only subsets, final metrics,
-calibration, subgroup counts, five FP/five FN, submission format and hashes.
-No exact cross-split duplicates were found after case/whitespace normalization;
-near duplicates were not exhaustively checked. Development history preserves the
-original experiments and the later refinement rather than squashing them together.
+The three existing verifiers (`verify_final_results.py`, `verify_neural_results.py`, `verify_last_refinement.py`) recompute saved metrics and check splits, selected checkpoints, submission IDs, transforms and hashes. `verify_audit_results.py` checks the earlier blend. Data-dependent verification requires local competition files; the repository is intentionally not a data distribution package.
 
-Codex assisted Grace with implementation, execution, debugging, selected validation
-passage inspection, hypotheses and report writing. The experiments were actually
-run; metrics and the rendered PDF were checked. Automated verification is not
-claimed as human review. Every member should review their contributions, claims
-and AI-use disclosure before final submission. No external LLM API predicted test
-labels and no hidden labels were retrieved.
-
-The earlier NB submission achieved public AUROC **0.85994**, an increase of **0.00945**
-over the earlier word-only submission (0.85049). This compares different full
-pipelines, not the isolated effect of NB weighting. The latest submitted blend scored **0.88628**; neural candidates have been generated and await Kaggle scoring before final report selection. Private performance remains
-unknown until Kaggle reveals it.
+Codex assisted Yingzi Gu with code, execution, debugging, passage inspection, hypotheses and LaTeX drafting. Experiments were run and outputs checked; automated verification is not a claim of human review. Team members remain responsible for reviewing their contributions and disclosures. Error explanations are hypotheses, not causal attributions. No exact normalized cross-split duplicates were found; near duplicates were not exhaustively checked. Repeated holdout and public leaderboard use limit generalization claims.

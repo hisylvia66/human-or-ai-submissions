@@ -1,6 +1,6 @@
 # Local neural experiment
 
-The latest confirmed public AUROC is **0.88628** for
+Before neural development, the confirmed public AUROC was **0.88628** for
 `artifacts/submission_robust_blend.csv`, compared with its fixed-validation
 AUROC of 0.988136. A higher fixed-validation score cannot establish a public
 score of 0.98–0.99. The neural experiment tests a different representation;
@@ -101,3 +101,5 @@ inference took 6.8 minutes; no further model fitting was performed.
 Both scores above are confirmed by the user screenshots. The neural-only public
 score exceeds the rank blend despite the reverse validation ordering. A final
 local robustness continuation is documented in `FINAL_REFINEMENT.md`.
+
+Final selection: pure DeBERTa, public AUROC **0.92433**. The subsequent robustness continuation scored **0.91085** and was rejected. Public scores influenced this selection; private performance remains unknown.

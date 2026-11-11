@@ -12,7 +12,7 @@ for name in scores.index:
 tex=r'''\newpage
 \begingroup\small\setlength{\emergencystretch}{2em}
 \section*{Final robustness continuation}
-The pure neural model scored 0.92433 publicly versus 0.92164 for its rank blend, reversing validation ordering. With one submission opportunity and one hour of local compute, we tested robustness continuation. Its Kaggle score is pending.
+The pure neural model scored 0.92433 publicly versus 0.92164 for its rank blend, reversing validation ordering. With one submission opportunity and one hour of local compute, we tested robustness continuation. It scored 0.91085 publicly, below the original neural model by 0.01348; it was rejected for final selection.
 
 \subsection*{Changes and leakage control}
 Validation starts from the saved 8,000-row model; final fitting starts from the separate model already trained on all 10,000 labels. Checkpoint and input hashes are recorded. The full-data model is never evaluated on overlapping validation labels. No external labels or prediction API are used. __COMPUTE_NOTE__
@@ -35,7 +35,7 @@ After the 384-token candidate lost clean AUROC, we additionally checked 256-toke
 \subsection*{Reproduction and limitations}
 See \texttt{FINAL\_REFINEMENT.md} and \texttt{run\_last\_refinement.py} (validate/refit modes). The separate output is \path{artifacts/submission_final_robust_neural.csv}. The verifier checks metrics, selection, IDs, transforms and hashes. Sigmoid outputs are uncalibrated.
 
-The reused holdout and synthetic tests do not establish hidden-domain performance. Context, normalization and augmentation form a combined intervention, not isolated effects. The candidate needs actual Kaggle evaluation; private scores remain unknown.
+The reused holdout and synthetic tests do not establish hidden-domain performance. Context, normalization and augmentation form a combined intervention, not isolated effects. The observed public decline shows that these synthetic gains did not transfer. The changed preprocessing, augmentation, context window and shorter final continuation are confounded; no single failure cause is established. Private scores remain unknown.
 \endgroup
 '''
 if f:

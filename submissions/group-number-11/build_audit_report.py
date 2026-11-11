@@ -21,7 +21,7 @@ tex=r'''\newpage
 \small
 \setlength{\emergencystretch}{2em}
 \section*{Post-submission audit and improved submission}
-\textbf{Status.} Q0--Q4 describe the submitted NB model (public AUROC 0.85994). This appendix records a subsequent independent review and the NB/style blend. '''+score_status+r'''
+\textbf{Status.} This appendix preserves the historical NB stage (public AUROC 0.85994); the final main report selects DeBERTa. This appendix records a subsequent independent review and the NB/style blend. '''+score_status+r'''
 
 \subsection*{What the review found}
 The high fixed-validation score did not establish generalization. Among the supplied labels, no human passage contains double newlines, while 3,301 of 5,000 AI passages do. Many large NB coefficients involve line breaks or template markers. Applying Unicode/quote/whitespace normalization to both validation classes reduces NB AUROC from 0.977012 to 0.917921; also removing punctuation gives 0.888169. These tests demonstrate sensitivity, not the exact cause of hidden-test errors.

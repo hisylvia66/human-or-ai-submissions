@@ -11,7 +11,7 @@ if not built.exists():
 shutil.copy2(built,report/'report.pdf')
 target=TEAM/'artifacts/group11_overleaf.zip'
 with zipfile.ZipFile(target,'w',compression=zipfile.ZIP_DEFLATED) as z:
-    for name in ('main.tex','metrics.tex','audit_appendix.tex','neural_appendix.tex','last_refinement_appendix.tex','status.json','README.md'):
+    for name in ('main.tex','metrics.tex','audit_appendix.tex','neural_appendix.tex','neural_method.tex','neural_q4.tex','last_refinement_appendix.tex','status.json','README.md'):
         z.write(report/name,name)
     for directory in ('tables','figures'):
         for file in sorted((report/directory).iterdir()):

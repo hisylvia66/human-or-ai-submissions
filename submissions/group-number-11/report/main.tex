@@ -1,4 +1,4 @@
-\documentclass[11pt,letterpaper]{article}
+\documentclass[10pt,letterpaper]{article}
 \usepackage[margin=0.86in]{geometry}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -27,6 +27,7 @@
 \titlespacing*{\section}{0pt}{15pt}{6pt}
 \titlespacing*{\subsection}{0pt}{10pt}{4pt}
 \setlength{\parindent}{0pt}
+\setlength{\emergencystretch}{2em}
 \setlength{\parskip}{4.5pt}
 \setlength{\headheight}{15pt}
 \renewcommand{\arraystretch}{1.16}
@@ -57,8 +58,8 @@
 \textbf{Kaggle team:} Group Number 11\par
 \textbf{Course GitHub PR:} \PRLink\par
 \textbf{Branch:} \texttt{submission/group-number-11}\par
-\textbf{Submission status (NB stage):} \SubmissionStatus\par
-\smallnote{Working report: main sections preserve NB-stage experiments. Appendices record later public scores (best confirmed: 0.92433) and the final robustness candidate, whose Kaggle score is pending.}
+\textbf{Submission status:} \SubmissionStatus\par
+\smallnote{Final selection uses the best observed public AUROC, 0.92433. Public leaderboard reuse is part of model selection; private performance remains unknown.}
 
 \section*{Q0. Team information and model summary}
 \question{Q0.1.}{Team members and main contributions.}
@@ -66,25 +67,25 @@
 Member & NetID & Contributions\\\midrule
 Yilin Gao & yg695 & Initial pipeline, model comparison and tuning (Q1); shared split and initial submissions.\\
 Ansh Raj Bhargava & ab3396 & Unlabeled-data experiments (Q3) and robustness improvements (Q5).\\
-Yingzi Gu (Grace) & yg667 & Learning curves and error analysis (Q2/Q4); final refinement, reproducibility and LaTeX integration, with AI assistance disclosed in Q6.\\\bottomrule
+Yingzi Gu & yg667 & Learning curves and error analysis (Q2/Q4); final refinement, reproducibility and LaTeX integration, with AI assistance disclosed in Q6.\\\bottomrule
 \end{tabularx}\par
 \question{Q0.2.}{Final pipeline, from text to probability.}
-We concatenate word unigram/bigram TF-IDF and character 3--5-gram TF-IDF. A smoothed class log-count ratio, estimated only from labeled training documents, reweights each feature before fitting a linear SVM with $C=0.5$. We selected this NB-weighted model using the fixed 2,000-row validation set, then retrained it on all 10,000 labeled examples for Kaggle. A sigmoid fitted to full-pipeline out-of-fold training margins converts scores to estimated AI probabilities. The final model does not use pseudo-labels, because the tested self-training candidate had lower validation AUROC.
+The final model is DeBERTa-v3-small, initialized from pinned general-language pretrained weights and fine-tuned using only competition labels. We normalize whitespace, retain the first 256 tokens, freeze embeddings, and train the encoder and classifier for two epochs. The development run uses the fixed 8,000/2,000 split; a separate final model is trained from the original pretrained weights on all 10,000 labeled rows. Softmax supplies uncalibrated AI scores. No pseudo-labels or ensemble are used in the selected submission. The neural-method appendix specifies settings and provenance.
 \question{Q0.3.}{Final scores.}
 \begin{tabularx}{\linewidth}{@{}Yr@{}}\toprule
 Metric & Score\\\midrule
-Selected model validation AUROC & \FinalValAUC\\
+Selected model validation AUROC & 0.989423\\
 Selected model Kaggle public AUROC & \PublicScore\\
 Selected model Kaggle private AUROC & \PrivateScore\\\bottomrule
 \end{tabularx}\par
-\smallnote{The screenshot-confirmed earlier public score is 0.85049 for \texttt{submission\_word\_svm\_c05.csv}. It is not the score of the selected NB-weighted model. No private score is inferred or fabricated.}
+\smallnote{Selected file: \texttt{submission\_deberta.csv}. The rank blend scored 0.92164; the later robustness continuation scored 0.91085. We retain both negative comparisons. Public scores guide final selection and are not an untouched estimate of generalization.}
 
-\smallnote{All experiments use the committed 8,000/2,000 split and seed 42. No raw or case/whitespace-normalized exact cross-split duplicates were found; near duplicates were not exhaustively tested. Repeated selection can make validation scores optimistic.}
+\smallnote{All development runs use the committed 8,000/2,000 split. Most use seed 42; the robustness continuation uses 2026. No raw or case/whitespace-normalized exact cross-split duplicates were found; near duplicates were not exhaustively tested.}
 
 \newpage
 \section*{Q1. Model comparison and selection}
 \question{Q1.1.}{Preprocessing and text representation.}
-We use light preprocessing to preserve stylistic cues. The word vectorizer lowercases text and uses scikit-learn's default word-token pattern (tokens of at least two word characters), with unigrams and bigrams. Character features use lowercased character 3--5-grams and retain local punctuation and spacing patterns. Both vectorizers use minimum document frequency 2, sublinear term frequency, their default smoothed IDF and L2 normalization, with caps of 100,000 word and 150,000 character features. Each vocabulary and its IDF weights are learned exclusively from training data. Character features complement vocabulary with morphology and local formatting. The final model adds supervised NB feature weighting, defined in Q5; it does not apply the Unicode folding tested in the robustness experiment.
+We use light preprocessing to preserve stylistic cues. The word vectorizer lowercases text and uses scikit-learn's default word-token pattern (tokens of at least two word characters), with unigrams and bigrams. Character features use lowercased character 3--5-grams and retain local punctuation and spacing patterns. Both vectorizers use minimum document frequency 2, sublinear term frequency, their default smoothed IDF and L2 normalization, with caps of 100,000 word and 150,000 character features. Each vocabulary and its IDF weights are learned exclusively from training data. Character features complement vocabulary with morphology and local formatting. The historical classical refinement adds supervised NB feature weighting, defined in Q5; it does not apply the Unicode folding tested in the robustness experiment.
 \question{Q1.2.}{Comparison of three modeling approaches on the same split.}
 \input{tables/q1_comparison.tex}
 \smallnote{Current-environment rerun. All three use word TF-IDF; timing includes feature extraction and classifier fitting, excluding evaluation. Historical teammate results are retained separately and differ slightly because the original environment was not pinned.}
@@ -92,12 +93,12 @@ We use light preprocessing to preserve stylistic cues. The word vectorizer lower
 For logistic regression we searched $C\in\{0.1,0.5,1,2,5\}$; for the linear SVM, $C\in\{0.01,0.1,0.5,1,2\}$. All other settings and validation IDs were fixed. The best word-only values were $C=5$ and $C=0.5$, respectively. We selected by held-out AUROC without test labels. Full results are below; this is model selection on a reused holdout rather than an unbiased final test estimate.
 {\small\input{tables/q1_tuning.tex}}
 \question{Q1.4.}{Final selection and subsequent changes.}
-The original selected model combined word and character TF-IDF with SVM $C=0.5$, reaching 0.971228 in the current environment. We then compared six fixed refinement configurations (Q5). NB-weighted TF-IDF achieved \FinalValAUC, a gain of \Improvement, with similar laptop-scale training cost, and was selected. Its label-dependent feature weights are refitted within every calibration fold. We retained the original supervised model for Q2's controlled learning-curve experiment, but reran all Q4 analyses on the final selected model. Q3 and Q5 negative results remain part of the experimental record rather than being overwritten.
+The word/character SVM reached 0.971228 validation AUROC. NB weighting then reached \FinalValAUC, and the NB/style blend reached 0.988136; their public scores were 0.85994 and 0.88628. Contextual DeBERTa reached 0.989423 locally and 0.92433 publicly. Its rank blend improved local AUROC to 0.994594 but reduced public AUROC to 0.92164. The later robust neural candidate scored 0.91085 publicly. We therefore select the original pure DeBERTa using observed public results. This is adaptive selection, not an independent test. Q2 holds the classical configuration fixed for a controlled size experiment; Q3 preserves the unlabeled-data study; Q4 below evaluates the selected neural model. Q5 and the appendices retain all improvement stages and failures.
 
 \newpage
 \section*{Q2. Effect of training data size}
 \question{Q2.1.}{One fixed configuration at five training sizes.}
-We use the original word + character TF-IDF / SVM ($C=0.5$) configuration throughout this experiment. This is the supervised reference configuration, not the later NB-weighted final model. Using seed 42, we independently shuffle each class pool and interleave them to obtain balanced, nested training subsets. The 8,000-row fit retains the original committed row order. Every size refits its own vocabulary and IDF weights, with identical hyperparameters and the same untouched validation IDs.
+We use the original word + character TF-IDF / SVM ($C=0.5$) configuration throughout this experiment. This is the supervised reference configuration, not the final neural model. Using seed 42, we independently shuffle each class pool and interleave them to obtain balanced, nested training subsets. The 8,000-row fit retains the original committed row order. Every size refits its own vocabulary and IDF weights, with identical hyperparameters and the same untouched validation IDs.
 
 \input{tables/q2_curve.tex}
 \smallnote{Times include TF-IDF and SVM fitting, excluding scoring and probability calibration. Subset membership is recorded in \texttt{learning\_curve\_subset\_ids.csv}.}
@@ -111,52 +112,22 @@ Training AUROC is 1.0 at every size, while validation AUROC increases monotonica
 \newpage
 \section*{Q3. Learning from unlabeled data}
 \question{Q3.1.}{Method and leakage prevention.}
-Person B tested confidence-based self-training using the 3,000 unlabeled passages. The supervised word + character SVM predicts margins, transformed to probabilities with a logistic sigmoid fitted to five-fold out-of-fold training margins. Passages with estimated AI probability at least $t$ or at most $1-t$ receive pseudo-labels and are added to training. Thresholds $t\in\{0.99,0.95,0.90,0.80,0.50\}$ were compared, followed by up to three rounds at the best threshold. Vectorizer fitting, calibration, and pseudo-label generation exclude the fixed validation set. Validation labels select settings but do not train models. These exploratory calibration folds share a vocabulary fitted on the 8,000-row training partition; the revised final-refinement implementation instead refits the full pipeline per fold.
+Person B tested confidence-based self-training using the 3,000 unlabeled passages. The supervised word + character SVM predicts margins, transformed to probabilities with a logistic sigmoid fitted to five-fold out-of-fold training margins. Passages with estimated AI probability at least $t$ or at most $1-t$ receive pseudo-labels and are added to training. Thresholds $t\in\{0.99,0.95,0.90,0.80,0.50\}$ were compared, followed by up to three rounds at the best threshold. Vectorizer fitting, calibration, and pseudo-label generation exclude the fixed validation set. Validation labels select settings but do not train models. These exploratory calibration folds share a vocabulary fitted on the 8,000-row training partition; the revised NB-stage implementation instead refits the full pipeline per fold.
 \question{Q3.2.}{Supervised versus unlabeled-data results.}
 \input{tables/q3_results.tex}
 \smallnote{Person B's committed Kaggle-environment results, preserved without replacing them with another environment's numbers. Runtime includes feature preparation; later self-training rounds report cumulative runtime. The current-environment reference AUROC is 0.971228 versus historical 0.971122.}
 \question{Q3.3.}{Did it help, and what limits the conclusion?}
 Self-training helped modestly: the best recorded two-round result was 0.972232 versus 0.971122 for supervised learning, a gain of 0.001110. At threshold 0.90, the first round added 2,167 pseudo-labeled passages; the second added 2,239. Lower thresholds admit more data but can introduce noise. In a training-only simulation, threshold 0.90 selected 2,022 of 3,000 held-back labeled examples with 1.88\% error, compared with 9.6\% when all were selected. This is an optimistic in-distribution diagnostic, not the error rate on genuinely unlabeled data. Threshold and round selection reuse the validation set, so the small gain is not independent confirmatory evidence.
 
-\subsection*{Connection to final refinement}
+\subsection*{Connection to the historical NB refinement}
 We also evaluated a reproducible two-round candidate with threshold 0.90 and a frozen sigmoid fitted from three-fold, full-pipeline out-of-fold training scores. Freezing avoids recalibrating on folds that contain pseudo-labels generated using all training targets. This revised procedure obtained 0.972186, above the current supervised baseline but below NB weighting. It differs from Person B's procedure and is reported as a separate experiment, not an exact reproduction. Its pseudo-label counts were 2,171 and 2,254. The final selected model therefore remains supervised.
 
-\newpage
-\section*{Q4. Generalization and error analysis}
-\question{Q4.1.}{Training versus validation performance of the final model.}
-The final NB-weighted model achieved training AUROC \FinalTrainAUC\ and validation AUROC \FinalValAUC, a gap of \FinalGap. This suggests some overfitting, while held-out ranking remains strong. High dimensionality, residual differences between training and validation passages, and repeated validation-based model selection are plausible contributors. No single cause is established. AUROC describes ranking, not accuracy at a fixed threshold. At the original SVM decision threshold of margin zero, the confusion matrix is:
-
-\input{tables/q4_confusion.tex}
-
-There are 56 false positives and 106 false negatives: false-positive rate 5.6\%, false-negative rate 10.6\%, and accuracy 91.9\%. The original unweighted model had 50 false positives and 127 false negatives, so improved ranking did not reduce both error types at the unchanged threshold.
-\question{Q4.2.}{Observable subgroups and differences.}
-We group passages by whitespace-separated word count, an observable quantity requiring no hidden domain information. The training length tertiles, 175 and 240 words, define short ($\leq175$), medium (176--240), and long ($>240$) groups. Ties stay together; boundaries were not chosen to maximize validation scores.
-
-\input{tables/q4_groups.tex}
-
-Short texts have the lowest AUROC (0.970135), while medium and long texts reach 0.981289 and 0.983670. Longer passages may provide more lexical and stylistic evidence, but this is an association, not a causal effect: topic, genre and class composition also differ. The long group still contains 41 false negatives at the fixed threshold. Group AUROC and threshold-dependent error counts should therefore be interpreted separately. Counts are included to show the amount of evidence behind each group.
-
-\subsection*{Probability estimates and operating point}
-We refit the entire NB-weighted pipeline in each of three stratified training folds and fit a logistic sigmoid to its out-of-fold margins. The held-out validation set never enters calibration. The fitted transformation is
-\[
-\widehat P(\mathrm{AI}\mid s)=\operatorname{sigmoid}(\CalSlope\,s+\CalIntercept).
-\]
-We retain the SVM's decision rule $s>0$, equivalent to $\widehat P(\mathrm{AI})>\FinalThreshold$. This is not a probability threshold of 0.5. The increasing transformation preserves AUROC; its probabilities may still be imperfectly calibrated because fold models use fewer observations than the full fit. The final Kaggle pipeline separately recalibrates using out-of-fold scores from all 10,000 labeled examples.
-
-\newpage
-\section*{Q4. Error examples and interpretation (continued)}
-\question{Q4.3.}{Five false positives and five false negatives.}
-FP means human text predicted AI; FN means AI text predicted human. We inspect the five highest-margin FP and five lowest-margin FN, deliberately emphasizing confident failures. These examples are not a random or representative sample of all errors. Reasons below are hypotheses grounded in passage inspection, not proven feature attributions or a claim that dataset labels are wrong.
-
-{\small\renewcommand{\arraystretch}{1.12}\input{tables/q4_errors.tex}}
-
-\question{Q4.4.}{Recurring failure patterns and a targeted response.}
-Polished human reference prose and reviews can resemble AI exposition (3671, 3326, 3448, 6567), while AI imitates technical forum posts, personal narratives, and recipes (1524, 3062, 8986, 2209). Genre and presentation therefore provide ambiguous authorship cues. Example 3665 adds a distinct failure: a news-style passage repeats nearly the same sentence throughout. Local lexical features preserve news vocabulary, while sublinear term frequency and normalization dampen repetition; the representation does not explicitly encode duplicate-sentence frequency. A targeted next experiment would add sentence-duplication fraction and longest repeated-sentence run as training-derived features, then compare against the unchanged baseline on the fixed validation IDs. This proposal has not been tested here. The selected cases support hypotheses but do not estimate prevalence, and neither surface polish nor factual plausibility establishes authorship.
+\input{neural_q4.tex}
 
 \newpage
 \section*{Q5. Open-ended improvements and insights}
 \question{Q5.1.}{Hypotheses motivating improvements.}
-Person B hypothesized that Unicode folding and typo augmentation could reduce brittleness to edited AI text, as the assignment describes adversarially modified test passages. Word/character TF-IDF matches local forms, so visually similar characters or inserted invisible characters may change features. In a later refinement, we hypothesized that class-informed feature weighting could emphasize discriminative word and character patterns instead of treating TF-IDF dimensions equally before regularization. These are separate experiments: robustness is evaluated on both original and synthetically perturbed validation passages, whereas final selection uses the original fixed validation set. Neither hypothesis guarantees improvement on the hidden test distribution.
+Person B hypothesized that Unicode folding and typo augmentation could reduce brittleness to edited AI text, as the assignment describes adversarially modified test passages. Word/character TF-IDF matches local forms, so visually similar characters or inserted invisible characters may change features. In a later refinement, we hypothesized that class-informed feature weighting could emphasize discriminative word and character patterns instead of treating TF-IDF dimensions equally before regularization. These are separate experiments: robustness is evaluated on both original and synthetically perturbed validation passages, whereas the classical refinement stage used the original fixed validation set; the eventual neural selection also used public results. Neither hypothesis guarantees improvement on the hidden test distribution.
 \question{Q5.2.}{Changes and controlled comparisons.}
 For robustness, R0 is word-only SVM; R1 is the word + character baseline; R2 adds NFKC normalization, selected homoglyph folding, zero-width removal and whitespace normalization; R3 additionally augments both training classes with typos. All retain SVM $C=0.5$ and the fixed split. The stress tests perturb only AI-labeled validation passages using typos, Cyrillic look-alikes, or inserted zero-width characters; they are synthetic conditions, not known test-set memberships.
 
@@ -182,16 +153,18 @@ Unicode normalization reduced original-validation AUROC from 0.971122 to 0.95970
 \section*{Q6. Code, reproducibility and AI assistance}
 \question{Q6.1.}{PR, entrypoints, dependencies and final predictions.}
 \textbf{PR:} \PRLink\par
-Run from \texttt{submissions/group-number-11/}, with data in \texttt{data/competition/}. Python 3.14.2; pinned dependencies; seed 42.
+Run from \texttt{submissions/group-number-11/}, with supplied data in \texttt{data/competition/}. The recorded neural run uses Python 3.14.2, pinned dependencies, seed 42 and local Apple MPS bfloat16.
 \begin{lstlisting}
-python -m pip install -r requirements-final.txt
-python run_final_refinement.py --data_dir data/competition
-python evaluate_final_model.py --data_dir data/competition
-python generate_final_submission.py --data_dir data/competition
-python verify_final_results.py --data_dir data/competition
-python build_report.py
+python -m pip install -r requirements-neural.txt
+python download_pretrained.py
+python train_neural.py --data_dir data/competition --mode validate --epochs 2 --batch_size 16 --accumulation 2 --max_length 256 --learning_rate 0.00003 --precision bf16 --freeze_embeddings
+python evaluate_neural.py
+python diagnose_neural.py --data_dir data/competition
+python train_neural.py --data_dir data/competition --mode refit
+python verify_neural_results.py --data_dir data/competition
+python export_selected_submission.py
 \end{lstlisting}
-The final prediction file is \texttt{artifacts/submission.csv}. See README for Q1--Q5 commands and JSON manifests for hashes. Raw data, passages, caches and weights are excluded from Git. Compile \texttt{report/main.tex} using Tectonic, or upload the standalone ZIP to Overleaf and use pdfLaTeX. After Kaggle scoring, update \texttt{report/status.json}, regenerate tables and recompile. Private score remains unavailable until revealed.
+The selected prediction file is \path{artifacts/submission_deberta.csv}; the export command copies its verified bytes to \path{artifacts/final_submission/submission.csv}. The repository README maps every question to commands and results. Checkpoint and input hashes distinguish development from full-data training. Raw data, passages, caches and weights stay excluded from Git. The standalone Overleaf ZIP includes all LaTeX sources and figures. The final public score is 0.92433; private score is not yet available. Classical Q2/Q3 experiments retain their original configurations and are not presented as neural learning curves or neural self-training results.
 \question{Q6.2.}{Development history and lessons.}
 \begin{itemize}
 \item \href{https://github.com/hisylvia66/human-or-ai-submissions/commit/8b44412}{8b44412 (Q3/Q5)}: self-training helped slightly; normalization could hurt original-validation performance.
@@ -199,8 +172,8 @@ The final prediction file is \texttt{artifacts/submission.csv}. See README for Q
 \item \href{https://github.com/hisylvia66/human-or-ai-submissions/commit/e999954}{e999954 (final refinement)} adds NB weighting, six-candidate comparison and updated Q4; the following commits integrate LaTeX. All candidates and selection limitations are retained.
 \end{itemize}
 \question{Q6.3.}{AI assistance and verification.}
-Codex assisted Grace with code, execution, debugging, passage inspection, hypotheses and LaTeX drafting. Automated checks validate split membership, metrics, calibration, IDs and submission hashes; the rendered PDF was visually checked. These are not claims of human review. Each member should review the report, understand the approach and confirm their own tool disclosure before submission. Results are measured, failure explanations are hypotheses, and unknown Kaggle scores remain unfilled. No external LLM API predicted test labels and no hidden labels were retrieved.
+Codex assisted Yingzi Gu with code, execution, debugging, passage inspection, hypotheses and LaTeX drafting. Automated checks validate split membership, metrics, calibration, IDs and submission hashes; the rendered PDF was visually checked. These are not claims of human review. Each member should review the report, understand the approach and confirm their own tool disclosure before submission. Results are measured, failure explanations are hypotheses, and unknown Kaggle scores remain unfilled. No external LLM API predicted test labels and no hidden labels were retrieved.
 \input{audit_appendix.tex}
-\input{neural_appendix.tex}
+\input{neural_method.tex}
 \input{last_refinement_appendix.tex}
 \end{document}

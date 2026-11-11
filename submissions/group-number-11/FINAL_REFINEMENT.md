@@ -1,3 +1,7 @@
+# Outcome: rejected robustness continuation
+
+Kaggle public AUROC is **0.91085**, confirmed by the user screenshot and recorded against the prediction SHA-256. This is **0.01348 below** the original DeBERTa (0.92433), which remains the final selected model. Synthetic improvements did not transfer. Changes to normalization, augmentation, context and training duration are confounded, so no single cause is established. Private score is unknown.
+
 # Final local robustness refinement
 
 The user confirmed **0.92433 public AUROC** for pure DeBERTa and **0.92164** for
@@ -64,9 +68,7 @@ changed hardware/precision can change numerical results.
 The final output is `artifacts/submission_final_robust_neural.csv`; it has a separate
 manifest and cannot inherit the public score of either earlier submission.
 
-Both the holdout and synthetic diagnostics are reused for selection. The new
-candidate needs real Kaggle evaluation; no unknown public/private score is filled
-in. Raw texts, model weights and generated submission CSVs remain local and ignored.
+Both the holdout and synthetic diagnostics are reused for selection. The candidate has now been evaluated on Kaggle; private performance remains unknown. Raw texts, model weights and generated submission CSVs remain local and ignored.
 
 Adaptive extension: after observing clean AUROC 0.983754 for 384-token views,
 we also evaluate 256-token head/tail inference on the same four conditions. This
