@@ -18,7 +18,7 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
-from sklearn.model_selection import train_test_split
+from run_person_c_evaluation import load_fixed_split
 from sklearn.naive_bayes import ComplementNB
 from sklearn.pipeline import Pipeline
 from sklearn.svm import LinearSVC
@@ -39,24 +39,18 @@ def scores(model, X_train, y_train, X_val, y_val):
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--train_csv", default=None)
     parser.add_argument("--zip", default="cornell-tech-cs-5785-combined-2026-ai-vs-human-text.zip")
     parser.add_argument("--out", default="model_comparison_results.csv")
     args = parser.parse_args()
 
-    with zipfile.ZipFile(args.zip) as z:
-        train = pd.read_csv(z.open("train.csv"))
-
-    train_idx, val_idx = train_test_split(
-        np.arange(len(train)),
-        test_size=2000,
-        random_state=SEED,
-        stratify=train["label"].to_numpy(),
-    )
-
-    X_train = train.iloc[train_idx]["text"]
-    y_train = train.iloc[train_idx]["label"]
-    X_val = train.iloc[val_idx]["text"]
-    y_val = train.iloc[val_idx]["label"]
+    if args.train_csv:
+        tr, va = load_fixed_split(args.train_csv)
+    else:
+        with zipfile.ZipFile(args.zip) as z:
+            tr, va = load_fixed_split(pd.read_csv(z.open("train.csv")))
+    X_train, y_train = tr.text, tr.label
+    X_val, y_val = va.text, va.label
 
     def tfidf():
         return TfidfVectorizer(

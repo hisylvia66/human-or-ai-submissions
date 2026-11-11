@@ -14,7 +14,7 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score
-from sklearn.model_selection import train_test_split
+from run_person_c_evaluation import load_fixed_split
 from sklearn.svm import LinearSVC
 
 SEED = 42
@@ -25,18 +25,9 @@ def main():
     parser.add_argument("--out", default="hyperparameter_tuning_results.csv")
     args = parser.parse_args()
 
-    train = pd.read_csv(args.train_csv)
-
-    idx = np.arange(len(train))
-    train_idx, val_idx = train_test_split(
-        idx,
-        test_size=2000,
-        random_state=SEED,
-        stratify=train["label"].to_numpy(),
-    )
-
-    y_train = train.iloc[train_idx]["label"].to_numpy()
-    y_val = train.iloc[val_idx]["label"].to_numpy()
+    tr, va = load_fixed_split(args.train_csv)
+    X_train, y_train = tr.text, tr.label.to_numpy()
+    X_val, y_val = va.text, va.label.to_numpy()
 
     vectorizer = TfidfVectorizer(
         ngram_range=(1, 2),
@@ -44,8 +35,8 @@ def main():
         max_features=100000,
         sublinear_tf=True,
     )
-    X_train = vectorizer.fit_transform(train.iloc[train_idx]["text"])
-    X_val = vectorizer.transform(train.iloc[val_idx]["text"])
+    X_train = vectorizer.fit_transform(X_train)
+    X_val = vectorizer.transform(X_val)
 
     rows = []
 

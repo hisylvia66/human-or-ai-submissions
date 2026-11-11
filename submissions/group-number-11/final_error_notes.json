@@ -1,0 +1,52 @@
+{
+  "3671": {
+    "observed_pattern": "Polished encyclopedic biography",
+    "possible_reason": "The human passage uses third-person biographical facts, institutional names, and smooth explanatory sentences. These surface features overlap with generated biographies; local word and character features cannot establish authorship from factual exposition alone.",
+    "report_reason": "Polished human biography: third-person facts and institutional names overlap with generated exposition."
+  },
+  "1524": {
+    "observed_pattern": "Technical excerpt followed by a personal question",
+    "possible_reason": "The AI passage combines dense quantum-optics terminology with a first-person request for explanation. Its mixed abstract/forum format and reference to missing visual context resemble a copied human discussion; local TF-IDF features do not assess whether the entire passage is coherent.",
+    "report_reason": "AI abstract plus personal question: technical terminology and missing visual context imitate a copied forum discussion."
+  },
+  "3062": {
+    "observed_pattern": "Informal first-person forum narrative",
+    "possible_reason": "The AI passage contains a greeting, personal details, uncertainty, repetitions, and awkward phrasing. These resemble informal human forum writing and may outweigh AI-associated features; first-person voice and imperfect grammar are not reliable authorship indicators.",
+    "report_reason": "AI personal narrative: greetings, uncertainty, awkward wording, and personal detail imitate human forum writing."
+  },
+  "3326": {
+    "observed_pattern": "Polished film review",
+    "possible_reason": "The human review follows a conventional plot-cast-action-music-summary structure with consistently positive adjectives and smooth transitions. These common review features can overlap with generated reviews; rhetorical polish alone is not evidence of AI authorship.",
+    "report_reason": "Human film review: formulaic praise and plot/cast/music structure resemble generated reviews."
+  },
+  "3448": {
+    "observed_pattern": "Technical reference exposition",
+    "possible_reason": "The human passage repeatedly defines and contextualizes density-functional theory using a formal explanatory voice, technical phrases, and historical background. The supervised token weighting can associate these features with AI despite their presence in human reference prose.",
+    "report_reason": "Human technical reference: repeated terminology and explanatory prose may receive AI-associated weights."
+  },
+  "4587": {
+    "observed_pattern": "Forum question with repeated logical explanation",
+    "possible_reason": "The human passage reasons through a fictional containment rule using repeated references to observation, hypothetical consequences, and questions. The orderly explanation can resemble generated reasoning despite personal phrasing and grammatical imperfections.",
+    "report_reason": "Human forum question: structured hypothetical reasoning and repetition resemble generated explanations."
+  },
+  "6567": {
+    "observed_pattern": "Historical and political summary",
+    "possible_reason": "The human passage presents a broad overview with dates, organization names, transitions, and a closing consequence. Its compact explanatory structure can resemble AI summaries; no factual verification or authorship inference beyond the supplied label is claimed.",
+    "report_reason": "Human historical summary: dates, named organizations, and broad concluding statements mimic AI summaries."
+  },
+  "8986": {
+    "observed_pattern": "Recipe formatting with personal-sounding ending",
+    "possible_reason": "The AI passage contains long ingredient lists, measured quantities, short procedural headings, and a first-person ending. Familiar recipe layout and informal personalization may resemble human recipe pages even though the final sentence is disconnected from the preceding instructions.",
+    "report_reason": "AI recipe: ingredient lists and headings mimic human recipes; an incongruous personal ending is overlooked."
+  },
+  "2209": {
+    "observed_pattern": "Conventional recipe instructions",
+    "possible_reason": "The AI passage uses specific quantities, ordinary cooking verbs, and a coherent sequence of short instructions. Recipe genre cues are shared with human text, so local token and character features may fail even without obvious linguistic mistakes.",
+    "report_reason": "AI recipe: quantities and ordinary procedural verbs resemble human instructions, with no obvious local anomaly."
+  },
+  "3665": {
+    "observed_pattern": "News-style text with extensive sentence repetition",
+    "possible_reason": "The AI passage repeatedly restates the same attributed budget-deficit claim with figures and news entities. News-like lexical features may dominate; sublinear term frequency and vector normalization reduce the effect of repeated tokens, and bag-of-ngram features do not explicitly count sentence duplication.",
+    "report_reason": "AI news-style passage repeats one claim extensively. Topic cues dominate; sublinear TF and normalization dampen repetition."
+  }
+}

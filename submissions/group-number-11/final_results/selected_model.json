@@ -1,0 +1,16 @@
+{
+  "config": "nbsvm",
+  "selection_rule": "Highest fixed-validation AUROC; fit time breaks exact ties",
+  "validation_auroc": 0.977012,
+  "delta_vs_baseline": 0.005784000000000011,
+  "paired_bootstrap_95ci": [
+    0.0014780022117706654,
+    0.010102961896741935
+  ],
+  "ci_caveat": "Descriptive, conditional on selected candidate; not adjusted for model selection",
+  "n_candidates": 6,
+  "seed": 42,
+  "train_csv_sha256": "325e345faf88fb1c4203278098c282e40319a87b4bf17e094d2f235f51d0c07e",
+  "unlabeled_csv_sha256": "42fe881240148a2e06583692ff16ded3df5bd60558820738b2de470680934aae",
+  "test_used_for_selection": false
+}

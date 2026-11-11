@@ -47,7 +47,7 @@ def make_model():
 
 
 def load_fixed_split(path):
-    data = pd.read_csv(path)
+    data = path.copy() if isinstance(path, pd.DataFrame) else pd.read_csv(path)
     if not {"id", "text", "label"}.issubset(data.columns):
         raise ValueError("train.csv must contain id, text, label")
     if data.id.isna().any() or data.id.duplicated().any():

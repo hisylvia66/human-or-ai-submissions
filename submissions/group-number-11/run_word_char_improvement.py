@@ -14,7 +14,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.pipeline import FeatureUnion
 from sklearn.svm import LinearSVC
 from sklearn.metrics import roc_auc_score
-from sklearn.model_selection import train_test_split
+from run_person_c_evaluation import load_fixed_split
 
 SEED = 42
 
@@ -24,19 +24,9 @@ def main():
     parser.add_argument("--out", default="word_char_improvement_results.csv")
     args = parser.parse_args()
 
-    train = pd.read_csv(args.train_csv)
-    idx = np.arange(len(train))
-    train_idx, val_idx = train_test_split(
-        idx,
-        test_size=2000,
-        random_state=SEED,
-        stratify=train["label"].to_numpy(),
-    )
-
-    X_train = train.iloc[train_idx]["text"]
-    y_train = train.iloc[train_idx]["label"].to_numpy()
-    X_val = train.iloc[val_idx]["text"]
-    y_val = train.iloc[val_idx]["label"].to_numpy()
+    tr, va = load_fixed_split(args.train_csv)
+    X_train, y_train = tr.text, tr.label.to_numpy()
+    X_val, y_val = va.text, va.label.to_numpy()
 
     features = FeatureUnion([
         ("word", TfidfVectorizer(

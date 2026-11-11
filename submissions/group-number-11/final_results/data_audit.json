@@ -1,0 +1,7 @@
+{
+  "train_validation_exact_overlap": 0,
+  "train_validation_normalized_overlap": 0,
+  "unlabeled_validation_normalized_overlap": 0,
+  "within_training_normalized_duplicates": 0,
+  "near_duplicate_check": "Not performed; normalized exact-match check only"
+}

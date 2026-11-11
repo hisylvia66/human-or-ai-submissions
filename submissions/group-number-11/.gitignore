@@ -1,0 +1,11 @@
+# Local competition files, selected passages, generated submissions and bundles.
+/data/
+/artifacts/
+/submission*.csv
+*.log
+*.aux
+*.out
+*.synctex.gz
+# Explicitly version small, text-free experiment tables despite the root *.csv rule.
+!/final_results/*.csv
+!/person_c_results/*.csv
