@@ -8,8 +8,8 @@ The report follows Q0–Q6 in the course template, omitting the blank instructio
 and rubric pages. No source passages or competition datasets are included.
 
 The selected model is NB-weighted word/character TF-IDF + LinearSVC C=0.5,
-validation AUROC 0.977012. New-model Kaggle scores are not yet available. Do not
-replace them with the older word-only model's 0.85049.
+validation AUROC 0.977012 and screenshot-confirmed Kaggle public AUROC 0.85994.
+Private AUROC is not yet available. The older word-only model scored 0.85049.
 
 In the repository, edit `report/status.json`, run `python build_report.py`, compile
 `report/main.tex` and run `python package_report.py`. Tables and macros are derived

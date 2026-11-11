@@ -14,7 +14,8 @@
     "test.csv": "02209fdb74607f6b5f09a43300ed74761edf76f161cf9fd579cf43fb213884cd",
     "sample_submission.csv": "2fdb037826ae4a83136c393fa9d29fd74d899b2dd06d32caadbe3a56e356193d"
   },
-  "public_score": null,
+  "public_score": 0.85994,
   "private_score": null,
-  "kaggle_status": "Generated locally; not submitted"
+  "kaggle_status": "Submitted; public score confirmed by user-provided screenshot",
+  "public_score_evidence": "Kaggle row: submission.csv, Complete, Yingzi(Grace) Gu, public score 0.85994"
 }

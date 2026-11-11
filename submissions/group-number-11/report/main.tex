@@ -76,7 +76,7 @@ Selected model validation AUROC & \FinalValAUC\\
 Selected model Kaggle public AUROC & \PublicScore\\
 Selected model Kaggle private AUROC & \PrivateScore\\\bottomrule
 \end{tabularx}\par
-\smallnote{The only screenshot-confirmed earlier public score is 0.85049 for \texttt{submission\_word\_svm\_c05.csv}. It is not the score of the selected NB-weighted model. No private score is inferred or fabricated.}
+\smallnote{The screenshot-confirmed earlier public score is 0.85049 for \texttt{submission\_word\_svm\_c05.csv}. It is not the score of the selected NB-weighted model. No private score is inferred or fabricated.}
 
 \smallnote{All experiments use the committed 8,000/2,000 split and seed 42. No raw or case/whitespace-normalized exact cross-split duplicates were found; near duplicates were not exhaustively tested. Repeated selection can make validation scores optimistic.}
 
@@ -175,7 +175,7 @@ The same word/character TF-IDF settings and SVM $C=0.5$ are retained. Counts use
 
 \newpage
 \question{Q5.4.}{Support for the hypotheses, limitations and next steps.}
-Unicode normalization reduced original-validation AUROC from 0.971122 to 0.959700, and typo augmentation did not recover it (0.959011). Homoglyph robustness improved slightly, but the reported paired interval included zero. We therefore did not adopt normalization merely because it seemed intuitively robust. NB weighting improved original-validation AUROC from 0.971228 to \FinalValAUC. A paired 1,000-resample bootstrap gives a descriptive 95\% interval of [\CILow,\CIHigh] for its AUROC gain. This interval is conditional on the selected candidate and is not adjusted for repeated model selection. Thus the result supports further testing but does not prove improvement on unseen generators or adversarial text. All six candidates and negative results remain recorded. The next step is the generated Kaggle submission and, for future modeling, a predefined sentence-repetition feature ablation motivated by Q4. The private test score is unknown.
+Unicode normalization reduced original-validation AUROC from 0.971122 to 0.959700, and typo augmentation did not recover it (0.959011). Homoglyph robustness improved slightly, but the reported paired interval included zero. We therefore did not adopt normalization merely because it seemed intuitively robust. NB weighting improved original-validation AUROC from 0.971228 to \FinalValAUC. A paired 1,000-resample bootstrap gives a descriptive 95\% interval of [\CILow,\CIHigh] for its AUROC gain. This interval is conditional on the selected candidate and is not adjusted for repeated model selection. Thus the result supports further testing but does not prove improvement on unseen generators or adversarial text. All six candidates and negative results remain recorded. The submitted pipeline scored 0.85994 publicly versus 0.85049 for the earlier word-only submission; this is not an isolated test of NB weighting. Private performance remains unknown.
 
 
 \section*{Q6. Code, reproducibility and AI assistance}

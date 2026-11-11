@@ -4,7 +4,7 @@ Yilin Gao (yg695), Yingzi Gu / Grace (yg667), Ansh Raj Bhargava (ab3396).
 Work on `submission/group-number-11`. All project changes belong in this team directory.
 
 Course draft PR: https://github.com/sekhari/human-or-ai-submissions/pull/13
-The PR remains a draft pending team review and the actual new-model Kaggle score.
+The PR remains a draft pending team review; the new-model public score is now recorded.
 
 ## Selected approach and submission status
 
@@ -16,8 +16,8 @@ It was selected from six recorded candidates using the committed 8,000/2,000 spl
 - Improvement: **0.005784**. The descriptive paired bootstrap interval is
   [0.001478, 0.010103]; it is conditional on selection, not multiplicity-adjusted.
 - Final Kaggle predictions are generated locally at `artifacts/submission.csv`.
-  The new model has **not been submitted**, so its public/private AUROC is unknown.
-- The only screenshot-confirmed historical public score is **0.85049**, for
+  The submitted new model achieved **public AUROC 0.85994**, confirmed by the user-provided Kaggle screenshot. Private AUROC remains unknown.
+- The screenshot-confirmed previous public score is **0.85049**, for
   `submission_word_svm_c05.csv`. The earlier team message's 0.87240 is unverified
   and is not reported as the final model's score.
 
@@ -175,6 +175,8 @@ claimed as human review. Every member should review their contributions, claims
 and AI-use disclosure before final submission. No external LLM API predicted test
 labels and no hidden labels were retrieved.
 
-The remaining external step is uploading the generated CSV to Kaggle and entering
-its actual score. Review the PDF and course PR, then submit the PDF and PR URL in
-the course portal. Private performance remains unknown until Kaggle reveals it.
+The new submission is complete: public AUROC **0.85994**, an increase of **0.00945**
+over the earlier word-only submission (0.85049). This compares different full
+pipelines, not the isolated effect of NB weighting. Review the PDF and course PR,
+then submit the PDF and PR URL in the course portal. Private performance remains
+unknown until Kaggle reveals it.

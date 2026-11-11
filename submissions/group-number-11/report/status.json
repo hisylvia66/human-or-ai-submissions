@@ -1,8 +1,9 @@
 {
   "pr_url": "https://github.com/sekhari/human-or-ai-submissions/pull/13",
-  "public_score": null,
+  "public_score": 0.85994,
   "private_score": null,
-  "submission_status": "Generated locally; awaiting Kaggle submission",
+  "submission_status": "Submitted to Kaggle; public score confirmed",
   "confirmed_previous_submission": "submission_word_svm_c05.csv",
-  "confirmed_previous_public_score": 0.85049
+  "confirmed_previous_public_score": 0.85049,
+  "public_score_evidence": "User-provided Kaggle screenshot: submission.csv, Complete, public score 0.85994"
 }
