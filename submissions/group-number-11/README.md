@@ -1,173 +1,175 @@
 # Group Number 11 — Human or AI?
 
-## Team Members
-- Yilin Gao / yg695
-- Yingzi Gu / yg667
-- Ansh Raj Bhargava / ab3396
+Yilin Gao (yg695), Yingzi Gu / Grace (yg667), Ansh Raj Bhargava (ab3396).
+Work on `submission/group-number-11`. All project changes belong in this team directory.
 
-## Kaggle Team
-Group Number 11
+## Selected approach and submission status
 
-## Baseline
-Initial baseline: TF-IDF + Logistic Regression
+The selected model is **NB-weighted word + character TF-IDF with LinearSVC(C=0.5)**.
+It was selected from six recorded candidates using the committed 8,000/2,000 split.
 
-Validation AUROC: 0.9343
-Training AUROC: 0.9953
+- Final validation AUROC: **0.977012**; training AUROC: **0.999964**.
+- Original word + character SVM baseline in the same environment: **0.971228**.
+- Improvement: **0.005784**. The descriptive paired bootstrap interval is
+  [0.001478, 0.010103]; it is conditional on selection, not multiplicity-adjusted.
+- Final Kaggle predictions are generated locally at `artifacts/submission.csv`.
+  The new model has **not been submitted**, so its public/private AUROC is unknown.
+- The only screenshot-confirmed historical public score is **0.85049**, for
+  `submission_word_svm_c05.csv`. The earlier team message's 0.87240 is unverified
+  and is not reported as the final model's score.
 
-## Reproducibility
-Use the fixed train/validation split provided in:
-- `train_ids.csv`
-- `validation_ids.csv`
+The final model estimates smoothed class log-count ratios from binary training
+feature occurrences, multiplies TF-IDF by those ratios, then fits the SVM. Word
+features are 1–2 grams (100,000 cap); character features are 3–5 grams (150,000 cap).
+Both use min_df=2, sublinear TF and default L2 normalization. Output probabilities
+come from a logistic sigmoid fitted to full-pipeline 3-fold out-of-fold training
+margins. Feature vocabularies, IDF and supervised weights are refit per fold.
+The final Kaggle fit uses all 10,000 labeled rows. The selected model does not use
+unlabeled examples, though Q3 tests their value.
 
-Random seed: 42
+## Install and data
 
-## Run
-Install dependencies:
-
-pip install -r requirements.txt
-
-Run baseline:
-
-python run_baseline.py
-
-## Current Final Model
-
-Our current selected model is a Linear SVM with combined word-level and character-level TF-IDF features.
-
-- Word TF-IDF: unigrams and bigrams
-- Character TF-IDF: 3-5 grams
-- Linear SVM: `C=0.5`
-- Random seed: `42`
-- Fixed validation split: 8,000 training / 2,000 validation examples
-
-Validation AUROC: approximately `0.9711`
-
-Kaggle public AUROC for this model: `0.87240`
-
-### Generate the Kaggle submission
-
-Place the Kaggle files locally under `data/`:
-
-- `train.csv`
-- `test.csv`
-- `sample_submission.csv`
-
-Then run:
+The recorded environment is Python **3.14.2**. Exact direct dependencies are pinned:
 
 ```bash
-python generate_submission.py \
-  --train_csv data/train.csv \
-  --test_csv data/test.csv \
-  --sample_submission data/sample_submission.csv \
-  --out submission.csv
+cd submissions/group-number-11
+python -m pip install -r requirements-final.txt
 ```
 
-The script retrains the selected model on all 10,000 labeled training examples and outputs AI-authorship scores in `[0,1]`.
+Place the supplied files in `data/competition/`:
+`train.csv`, `unlabeled.csv`, `test.csv`, `sample_submission.csv`.
+Do not commit competition data, full passage excerpts, credentials or model weights.
+Existing `requirements.txt` is the unpinned dependency list for earlier experiments.
 
-### Notes
+## Reproduce final selection, evaluation and predictions
 
-The Kaggle competition files are not committed to this repository.
-Model selection and hyperparameter tuning were based on the fixed held-out validation set, not Kaggle test labels.
-
-
-## Person B experiments (Q3 + Q5)
-
-All Person B scripts use the committed split (`train_ids.csv` / `validation_ids.csv`, seed 42),
-the selected model (word 1–2 + char 3–5 TF-IDF + LinearSVC, C=0.5) and seed 42.
-`data_utils.py` finds the data automatically: `./data`, then `/kaggle/input/...` (Kaggle notebook),
-then `kagglehub`, then the Kaggle API (Colab / laptop with `KAGGLE_USERNAME` + `KAGGLE_KEY`).
-
-**One-click run:** open `person_b_experiments.ipynb` on Kaggle with the competition attached as
-input and Internet on → Run All (about 10–15 min CPU). Results land in `/kaggle/working/personB_results/`.
-
-### Q3 — unlabeled data
-```bash
-python run_unlabeled_experiment.py --data_dir data
-```
-Self-training: SVM margins → P(AI) via Platt scaling on out-of-fold training scores; unlabeled rows
-with P(AI) ≥ t or ≤ 1−t are pseudo-labeled and added, t ∈ {0.99, 0.95, 0.90, 0.80, all}; then
-3 iterative rounds at the best t. Also: TF-IDF fit on train+unlabeled text, simulated pseudo-label
-error rate, train/unlabeled/test domain-shift AUROC, model confidence per set.
-Outputs: `unlabeled_experiment_results.csv`, `unlabeled_pseudo_label_noise.csv`,
-`unlabeled_domain_shift.csv`, `unlabeled_confidence_by_set.csv`, `unlabeled_self_training.png`.
-
-### Q5 — robustness to adversarially edited AI text
-```bash
-python run_robustness_improvement.py --data_dir data --submit R2
-```
-R0 word-only SVM (reference) · R1 word+char SVM (baseline) · R2 R1 + unicode normalization (NFKC,
-homoglyph folding, zero-width removal) · R3 R2 + typo augmentation of both classes. Evaluated on
-clean validation and on copies where only AI passages get typos / Cyrillic homoglyphs / zero-width
-characters, with paired-bootstrap 95% CIs vs R1, plus a census of such characters in each split.
-`--submit R2` retrains R2 on all 10,000 labeled rows and writes `submission_R2.csv`.
-Outputs: `robustness_improvement_results.csv`, `robustness_char_census.csv`,
-`robustness_validation_scores.csv`.
-
-## Person C experiments (Q2 + Q4)
-
-Run from this team directory (Python 3.10+ and the existing requirements):
+Run from this team directory:
 
 ```bash
-python run_person_c_evaluation.py \
-  --train_csv /path/to/competition/train.csv \
-  --review_text data/person_c_error_review.csv
+python run_final_refinement.py --data_dir data/competition
+python evaluate_final_model.py --data_dir data/competition
+python generate_final_submission.py --data_dir data/competition
+python verify_final_results.py --data_dir data/competition
 ```
 
-Only the labeled competition file is needed. The script reads the committed ID
-files directly and rejects missing, duplicate, overlapping, or mismatched IDs.
-It never creates another train/validation split. Results go to `person_c_results/`.
+`final_model.py` is shared by all three workflows, so the evaluated and submitted
+configurations are identical. `run_final_refinement.py` never reads test data.
+It compares baseline, character weight 2, character-only, logistic regression C=5,
+NB weighting and two-round self-training. Selection is highest validation AUROC,
+with fit time breaking exact ties. Reusing the holdout for multiple experiments
+can make the selected score optimistic. No public leaderboard result guided selection.
 
-- Q2 uses balanced, nested subsets of 500/1,000/2,000/5,000/8,000 rows (seed 42).
-  Each size independently fits word (1–2) and character (3–5) TF-IDF and
-  LinearSVC(C=0.5), with exactly the selected model's remaining parameters.
-  Outputs: `learning_curve_results.csv`, `learning_curve_subset_ids.csv`, and
-  `learning_curve.png` / `.pdf`. Fit time includes feature fitting and SVM training.
-- Q4 uses the 8,000-row model from Q2. Length is whitespace-separated word count;
-  training-set tertiles define short/medium/long groups. Outputs:
-  `length_group_results.csv`, `validation_predictions.csv`,
-  `selected_error_predictions.csv`, `error_analysis.csv`, and `evaluation_summary.json`.
-  Reviewed case annotations are stored in `person_c_error_notes.json`; if a rerun
-  selects a different ID, its explanation is marked `REQUIRES TEXT REVIEW`.
-- AUROC and FP/FN use the original SVM margins (classification threshold 0).
-  P(AI) comes from a logistic sigmoid fitted to three-fold out-of-fold training
-  margins, refitting the full feature pipeline per fold. This preserves the
-  selected model's ranking. The equivalent probability threshold is recorded in
-  the summary and need not equal 0.5. Calibration reliability is not guaranteed.
-- The selected cases are the five most confidently wrong predictions per class;
-  they illustrate failure modes and are not a representative sample of all errors.
-  Read the optional local review file to write case-specific explanations.
-  That file contains competition text, is ignored by Git, and must not be committed.
-- One seeded learning curve is descriptive; it does not estimate variation across
-  training subsets. Length groups can differ in topic and class composition.
+`final_results/` contains candidate metrics and scores, selected configuration,
+input hashes, duplicate checks, final Q4 groups/errors, and the submission manifest.
+`evaluate_final_model.py` verifies that its independently refitted margins match
+those from selection. Error case annotations live in `final_error_notes.json`;
+newly selected IDs are marked for text review rather than automatically invented.
+The local review text is saved in ignored `data/final_error_review.csv`.
 
-The script records software versions, input/split hashes, group boundaries, and
-calibration parameters. `PERSON_C_REPORT.md` contains the completed Q2/Q4 report,
-including all ten case explanations and limitations. The committed run used
-Python 3.14.2; `requirements-person-c.txt` pins its dependency versions and can
-be installed instead of the general requirements for closer reproduction.
+Final errors use SVM margin > 0, equivalent to calibrated P(AI) > **0.529366** in
+this validation fit. The sigmoid preserves ranking and does not guarantee perfectly
+calibrated probabilities. Five most-confident errors per class are inspected;
+this purposive sample is not representative of all errors.
 
-Validation AUROC at 500/1,000/2,000/5,000/8,000 examples was
-0.890672 / 0.923734 / 0.947738 / 0.965055 / 0.971228; training AUROC was 1.0
-throughout. Short/medium/long validation AUROC was 0.958732 / 0.973797 / 0.983390.
-The full model made 50 false positives and 127 false negatives at margin 0.
+## Reproduce required experiments
 
-The original `run_word_char_improvement.py` also produced 0.971228 in this
-environment, matching the new script exactly. This differs by 0.000106 from
-the historical committed result 0.971122; the precise historical cause is not
-confirmed. Neither the validation split nor model configuration was changed.
-To reproduce that cross-check (the original script checks all four C values):
+### Q1: model comparison and tuning
+
+These scripts now read the committed IDs instead of reconstructing a random split.
+The original root-level result CSVs preserve earlier teammate runs. The report
+uses the current-environment reruns under `final_results/` for Q1.
 
 ```bash
-python run_word_char_improvement.py \
-  --train_csv /path/to/competition/train.csv \
-  --out person_c_results/original_script_reproduction.csv
+python run_model_comparison.py --train_csv data/competition/train.csv --out final_results/q1_model_comparison.csv
+python run_hyperparameter_tuning.py --train_csv data/competition/train.csv --out final_results/q1_hyperparameter_tuning.csv
+python run_word_char_improvement.py --train_csv data/competition/train.csv --out artifacts/word_char_replay.csv
 ```
 
-### AI assistance for Person C
+The older `run_baseline.py` is retained as initial development history and takes
+`--zip`; use the commands above for the final fixed-ID evaluation workflow.
 
-OpenAI Codex assisted with Q2/Q4 implementation, experiment execution, inspection
-of the ten selected passages, qualitative hypotheses, and report drafting.
-Split-integrity checks, a synthetic smoke check, output consistency checks, and
-an independent rerun of the original model script were performed. The plot was
-visually inspected. Grace should review the interpretations and disclosure before
-including them in the final report; these checks do not claim human review.
+### Q2: learning curve; historical supervised Q4
+
+```bash
+python run_person_c_evaluation.py --train_csv data/competition/train.csv --review_text data/person_c_error_review.csv
+```
+
+This preserves the original supervised word + character model at five balanced,
+nested sample sizes (500/1,000/2,000/5,000/8,000; seed 42). Each size refits TF-IDF.
+Validation AUROC is 0.890672 / 0.923734 / 0.947738 / 0.965055 / 0.971228.
+The PNG/PDF plot, metrics and subset IDs are in `person_c_results/`.
+Q2 is deliberately held fixed; final-model Q4 is separately rerun by
+`evaluate_final_model.py`. `PERSON_C_REPORT.md` is historical baseline analysis;
+use the integrated LaTeX report for the current final model.
+
+### Q3/Q5: Person B's original experiments
+
+The committed `unlabeled_*` and `robustness_*` files are Person B's recorded Kaggle
+runs. To reproduce without replacing that historical evidence, run in an ignored
+output directory (the scripts write several files to the working directory):
+
+```bash
+mkdir -p artifacts/replay_q3 artifacts/replay_q5
+(cd artifacts/replay_q3 && python ../../run_unlabeled_experiment.py --data_dir ../../data/competition)
+(cd artifacts/replay_q5 && python ../../run_robustness_improvement.py --data_dir ../../data/competition)
+```
+
+The report labels these runs separately because the historical dependency versions
+were not pinned. Their baseline is 0.971122 versus the current 0.971228. Results may
+vary slightly with software versions. The existing Kaggle/Colab notebook
+`person_b_experiments.ipynb` is also retained.
+
+Person B's calibration uses out-of-fold SVM margins with features shared within
+the training partition. The final-refinement self-training candidate instead
+refits full feature pipelines per fold and freezes its initial training-only
+sigmoid across rounds. The two procedures are intentionally not presented as exact
+replications. Both exclude the fixed validation set from fitting. Q3's historical
+best was 0.972232; the revised candidate obtained 0.972186. Q5 normalization and
+augmentation did not improve original-validation performance; negative results
+are retained and explained. Synthetic robustness scores do not represent known
+hidden-test subgroup scores.
+
+`generate_submission.py` and `run_robustness_improvement.py --submit R2` are legacy
+submission routes for earlier models. **Use `generate_final_submission.py` for
+the currently selected model.**
+
+## LaTeX report and Overleaf
+
+`report/main.tex` follows every Q0–Q6 question in the supplied template. Its tables
+and numeric macros are generated from result files, not manually copied scores.
+
+```bash
+python build_report.py
+tectonic --keep-logs --outdir artifacts/report report/main.tex
+python package_report.py
+```
+
+Tectonic is a separate system tool (not a pip dependency). On Overleaf, upload
+`artifacts/group11_overleaf.zip`, select `main.tex`, and use pdfLaTeX. The package
+script also copies the compiled PDF to `report/report.pdf`. The ZIP is standalone:
+all tables and the learning curve are included, with no competition data.
+
+After submitting `artifacts/submission.csv` to Kaggle, update the actual
+`public_score` and `submission_status` in `report/status.json`, then regenerate,
+compile and package the report. Leave private score null until it is revealed.
+The GitHub PR URL is also stored in that status file. Never substitute an older
+model's public score for the new model's score.
+
+## Verification, history and disclosure
+
+`verify_final_results.py` checks IDs, nested training-only subsets, final metrics,
+calibration, subgroup counts, five FP/five FN, submission format and hashes.
+No exact cross-split duplicates were found after case/whitespace normalization;
+near duplicates were not exhaustively checked. Development history preserves the
+original experiments and the later refinement rather than squashing them together.
+
+Codex assisted Grace with implementation, execution, debugging, selected validation
+passage inspection, hypotheses and report writing. The experiments were actually
+run; metrics and the rendered PDF were checked. Automated verification is not
+claimed as human review. Every member should review their contributions, claims
+and AI-use disclosure before final submission. No external LLM API predicted test
+labels and no hidden labels were retrieved.
+
+The remaining external step is uploading the generated CSV to Kaggle and entering
+its actual score. Review the PDF and course PR, then submit the PDF and PR URL in
+the course portal. Private performance remains unknown until Kaggle reveals it.

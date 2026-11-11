@@ -1,3 +1,5 @@
+> Historical Q2 and supervised-baseline Q4 analysis. The final selected model is now NB-weighted; use `report/main.tex` and `final_results/` for the final-model Q4 results. The Q2 experiment below remains valid.
+
 # Person C — Q2 and Q4
 
 Completed using the committed training and validation IDs and the selected supervised word + character TF-IDF / Linear SVM (C=0.5). All numbers below come from `person_c_results/`. This analysis does not replace Person B's semi-supervised or robustness experiments.
