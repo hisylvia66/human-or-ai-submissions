@@ -159,7 +159,7 @@ Person B hypothesized that Unicode folding and typo augmentation could reduce br
 \question{Q5.2.}{Changes and controlled comparisons.}
 For robustness, R0 is word-only SVM; R1 is the word + character baseline; R2 adds NFKC normalization, selected homoglyph folding, zero-width removal and whitespace normalization; R3 additionally augments both training classes with typos. All retain SVM $C=0.5$ and the fixed split. The stress tests perturb only AI-labeled validation passages using typos, Cyrillic look-alikes, or inserted zero-width characters; they are synthetic conditions, not known test-set memberships.
 
-For refinement, we specified six candidates: baseline, character weight 2, character-only features, logistic regression $C=5$, NB weighting, and revised two-round self-training. With binary training-document occurrence counts $n_{cj}$ for class $c$ and feature $j$, NB weighting uses
+For refinement, we specified six candidates: baseline, character weight 2, character-only features, logistic regression $C=5$, NB weighting, and revised two-round self-training. With binary training-document occurrence counts $n_{cj}$ for class $c$ and feature $j$, NB weighting adapts \href{https://aclanthology.org/P12-2018/}{Wang and Manning (2012)} to TF-IDF:
 \[
 p_{cj}=\frac{1+n_{cj}}{\sum_k(1+n_{ck})},\qquad
 r_j=\log\frac{p_{1j}}{p_{0j}},\qquad x'_j=x_jr_j.
@@ -195,7 +195,7 @@ The final prediction file is \texttt{artifacts/submission.csv}. See README for Q
 \begin{itemize}
 \item \href{https://github.com/hisylvia66/human-or-ai-submissions/commit/8b44412}{8b44412 (Q3/Q5)}: self-training helped slightly; normalization could hurt original-validation performance.
 \item \href{https://github.com/hisylvia66/human-or-ai-submissions/commit/c8e5c1f}{c8e5c1f (Q2/Q4)}: more labels narrowed the gap; error inspection exposed ambiguous genre cues.
-\item Final-refinement commits in the PR add NB weighting, six-candidate comparison, updated Q4 and LaTeX integration. All candidates and selection limitations are retained.
+\item \href{https://github.com/hisylvia66/human-or-ai-submissions/commit/e999954}{e999954 (final refinement)} adds NB weighting, six-candidate comparison and updated Q4; the following commits integrate LaTeX. All candidates and selection limitations are retained.
 \end{itemize}
 \question{Q6.3.}{AI assistance and verification.}
 Codex assisted Grace with code, execution, debugging, passage inspection, hypotheses and LaTeX drafting. Automated checks validate split membership, metrics, calibration, IDs and submission hashes; the rendered PDF was visually checked. These are not claims of human review. Each member should review the report, understand the approach and confirm their own tool disclosure before submission. Results are measured, failure explanations are hypotheses, and unknown Kaggle scores remain unfilled. No external LLM API predicted test labels and no hidden labels were retrieved.

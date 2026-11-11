@@ -3,6 +3,9 @@
 Yilin Gao (yg695), Yingzi Gu / Grace (yg667), Ansh Raj Bhargava (ab3396).
 Work on `submission/group-number-11`. All project changes belong in this team directory.
 
+Course draft PR: https://github.com/sekhari/human-or-ai-submissions/pull/13
+The PR remains a draft pending team review and the actual new-model Kaggle score.
+
 ## Selected approach and submission status
 
 The selected model is **NB-weighted word + character TF-IDF with LinearSVC(C=0.5)**.
@@ -17,6 +20,8 @@ It was selected from six recorded candidates using the committed 8,000/2,000 spl
 - The only screenshot-confirmed historical public score is **0.85049**, for
   `submission_word_svm_c05.csv`. The earlier team message's 0.87240 is unverified
   and is not reported as the final model's score.
+
+The NB weighting is inspired by [Wang and Manning (ACL 2012)](https://aclanthology.org/P12-2018/), adapted here to word/character TF-IDF.
 
 The final model estimates smoothed class log-count ratios from binary training
 feature occurrences, multiplies TF-IDF by those ratios, then fits the SVM. Word
