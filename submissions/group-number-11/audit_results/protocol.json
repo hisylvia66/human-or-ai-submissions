@@ -1,0 +1,12 @@
+{
+  "official_split": "Committed 8000/2000 IDs remain unchanged",
+  "diagnostics": ["Independent raw-data audit", "Submission ID and score checks", "Normalized exact and nearest-neighbor similarity audit", "Text-only train/test domain classification", "Training-only topic-group cross-validation", "Format and punctuation stress tests"],
+  "topic_groups": "12 label-free text clusters from official 8000-row training partition; three GroupKFold folds",
+  "candidate_components": ["raw_nb", "normalized_nb", "augmented_nb", "style"],
+  "fixed_blends": {"raw_style25": [0.75, 0.25], "aug_style25": [0.75, 0.25], "aug_style50": [0.5, 0.5]},
+  "blend_scaling": "Component decision scores divided by their own training-score standard deviation",
+  "candidate_selection": "Among candidates whose official validation AUROC is at least the existing 0.977012, prefer the highest mean training-only topic-held-out AUROC",
+  "selection_note": "Rule recorded after official-validation results were seen but before topic-fold comparisons completed; this audit is exploratory, not a preregistered confirmation study",
+  "test_use": "Aggregate unlabeled diagnostics only; test labels unavailable; no external LLM API predicts test labels",
+  "public_score_use": "The existing 0.85994 motivated an audit; no new candidate public scores are available or used to select blend weights"
+}

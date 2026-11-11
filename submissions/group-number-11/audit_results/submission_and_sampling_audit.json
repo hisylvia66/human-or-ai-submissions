@@ -1,0 +1,10 @@
+{
+  "same_distribution_900row_auroc_95interval": [
+    0.9712498894961885,
+    0.9827262328458258
+  ],
+  "submission_unique_probabilities": 3000,
+  "submission_min_probability": 1.2265592626405844e-10,
+  "submission_max_probability": 0.9999999999999556,
+  "note": "Descriptive resampling of reused validation data, not a confidence interval for the Kaggle population."
+}

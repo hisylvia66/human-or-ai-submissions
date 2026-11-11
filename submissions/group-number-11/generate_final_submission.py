@@ -8,6 +8,7 @@ import time
 import numpy as np
 import pandas as pd
 from final_model import TextModel, oof_scores, sigmoid_calibrator
+from submission_records import write_manifest
 
 TEAM = Path(__file__).resolve().parent
 
@@ -52,7 +53,7 @@ def main():
                                   for name in ('train.csv','unlabeled.csv','test.csv','sample_submission.csv')},
                     public_score=None,private_score=None,kaggle_status='Generated locally; not submitted')
     # Manifest is safe to commit; prediction file remains an ignored local artifact.
-    (TEAM/'final_results/submission_manifest.json').write_text(json.dumps(manifest,indent=2)+'\n')
+    write_manifest(TEAM/'final_results/submission_manifest.json', manifest)
     print(f'Saved {args.out}; {len(sub)} valid predictions.',flush=True)
 
 

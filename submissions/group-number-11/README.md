@@ -6,6 +6,35 @@ Work on `submission/group-number-11`. All project changes belong in this team di
 Course draft PR: https://github.com/sekhari/human-or-ai-submissions/pull/13
 The PR remains a draft pending team review; the new-model public score is now recorded.
 
+
+## Post-submission independent review and next candidate
+
+After the confirmed **0.85994** public score, an independent review found marked
+format sensitivity and a large drop under training-only text-cluster holdout.
+See [PROJECT_REVIEW.md](PROJECT_REVIEW.md) for evidence, code limitations and all
+candidate results. The new fixed 75:25 NB/stylometry blend reaches **0.988136**
+on official validation and **0.945723** mean cluster-CV AUROC (old NB: **0.903318**).
+It improves all three held-out cluster folds, but has not yet been scored on Kaggle.
+
+The **next candidate** is `artifacts/submission_robust_blend.csv`. The previous
+`artifacts/submission.csv` remains the actually submitted NB model with 0.85994.
+Do not confuse these files or transfer one model's score to the other.
+
+```bash
+python audit_project.py --data_dir data/competition
+python run_robustness_audit.py --data_dir data/competition
+python run_iid_audit_control.py --data_dir data/competition
+python generate_audit_candidate.py --data_dir data/competition
+python verify_audit_results.py --data_dir data/competition
+python build_audit_report.py
+```
+
+The report includes a post-submission audit appendix; its main Q0/Q4 still describe
+the model that was actually submitted. Promote the candidate and synchronize final
+Q4 only after confirming the next submission decision. Observed scores are retained
+only when prediction and input hashes match; changed predictions archive the old
+manifest instead of inheriting its leaderboard score.
+
 ## Selected approach and submission status
 
 The selected model is **NB-weighted word + character TF-IDF with LinearSVC(C=0.5)**.
