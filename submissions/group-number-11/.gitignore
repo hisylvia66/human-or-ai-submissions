@@ -15,3 +15,5 @@
 /audit_results/observable_features.csv
 /audit_results/domain_scores.csv
 !/neural_results/*.csv
+
+!/last_refinement_results/*.csv

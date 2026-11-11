@@ -4,7 +4,7 @@ Yilin Gao (yg695), Yingzi Gu / Grace (yg667), Ansh Raj Bhargava (ab3396).
 Work on `submission/group-number-11`. All project changes belong in this team directory.
 
 Course draft PR: https://github.com/sekhari/human-or-ai-submissions/pull/13
-The PR remains a draft pending new-candidate Kaggle scoring, final report selection and team review.
+The PR remains a draft pending the final robustness candidate score, report selection and team review.
 
 
 ## Latest submitted model and ongoing neural experiment
@@ -34,12 +34,13 @@ the historical NB stage, while the appendix records the newer blend and its conf
 only when prediction and input hashes match; changed predictions archive the old
 manifest instead of inheriting its leaderboard score.
 
-## Local neural refinement (not yet scored on Kaggle)
+## Local neural refinement and confirmed public scores
 
 Using the same 8,000/2,000 IDs, two-epoch local DeBERTa-v3-small fine-tuning
 reached **0.989423** validation AUROC. A single fixed 50:50 rank blend with the
-submitted NB/style model reached **0.994594**. These are local validation scores,
-not public scores. Checkpoint/candidate selection reuses the validation set.
+submitted NB/style model reached **0.994594**. These are local validation scores. The corresponding confirmed public scores are
+**0.92433** (pure neural) and **0.92164** (rank blend). Checkpoint/candidate selection
+reuses the validation set; the public ordering is reversed.
 
 The new outputs are `artifacts/submission_deberta.csv` (pure neural) and
 `artifacts/submission_deberta_robust_rank50.csv` (fixed rank blend). See
@@ -50,8 +51,9 @@ model's softmax values are uncalibrated; ensemble values are ranking scores.
 The report preserves earlier experiments and adds neural methods, subgroup
 results, ten inspected error cases and the pending-score status in an appendix.
 Run `build_report.py`, `build_audit_report.py`, and `build_neural_report.py` before
-compiling and packaging. Final course submission still requires choosing the
-final model and synchronizing Q0/Q4 after the new Kaggle result is known.
+compiling and packaging. A final one-hour robustness continuation is described in
+[FINAL_REFINEMENT.md](FINAL_REFINEMENT.md). Final course submission still requires
+confirming the last candidate score and synchronizing the final report selection.
 
 ## Earlier NB refinement (historical stage)
 

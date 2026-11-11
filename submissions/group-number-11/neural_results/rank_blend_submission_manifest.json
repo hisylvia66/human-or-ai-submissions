@@ -14,6 +14,8 @@
     "neural": "ad25adb0cdff64baa0e5d82bf3f71ac8cec1928bc66413fa0c45c56f99c4c07c",
     "robust": "d2175afdd7dfe511b07c1e39230d23fc98324e15f6fecfab9c05464504a74ca2"
   },
-  "public_score": null,
-  "private_score": null
+  "public_score": 0.92164,
+  "private_score": null,
+  "status": "Submitted; public score confirmed by user screenshot",
+  "public_score_evidence": "User screenshot: submission_deberta_robust_rank50.csv, Complete, public AUROC 0.92164"
 }

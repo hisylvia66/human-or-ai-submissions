@@ -17,8 +17,8 @@ if (O/'diagnostics.json').exists():
                  f"also removing punctuation gives {d['punctuation_removed_validation_auroc']:.6f}. These are synthetic stress tests, not measured hidden-test conditions.")
 tex=r'''\newpage
 \begingroup\small\setlength{\emergencystretch}{2em}
-\section*{Local neural refinement: candidate awaiting Kaggle evaluation}
-\textbf{Status.} The latest confirmed public AUROC is 0.88628 for the NB/style blend. The following neural candidates have no measured public or private score. Neither a high fixed-validation score nor model pretraining establishes a public AUROC of 0.98--0.99.
+\section*{Local neural refinement: measured Kaggle results}
+\textbf{Status.} The pure neural model scored 0.92433 publicly; the fixed neural/NB-style rank blend scored 0.92164. Both improved on the earlier NB/style blend (0.88628), but the locally better rank blend was worse publicly. Private scores remain unknown.
 
 \subsection*{Hypothesis and experimental protocol}
 After observing the validation/public gap, we tested whether contextual pretrained representations could complement local n-grams and stylistic statistics. We used Microsoft's general-purpose \href{https://huggingface.co/microsoft/deberta-v3-small}{DeBERTa-v3-small}, following \href{https://arxiv.org/abs/2111.09543}{DeBERTaV3 (He et al.)}. The exact weight revision is recorded in \texttt{neural\_results/pretrained\_source.json}. Pretraining is external general-language training; the only supervised labels in our fine-tuning are the supplied competition labels. All training and prediction run locally, with no external inference API or hidden labels.
@@ -38,9 +38,9 @@ We also test one fixed 50:50 mean-percentile-rank blend of the neural scores and
 '''+diagnostics+r'''
 
 \subsection*{Limitations and submission procedure}
-About 50.5\% of validation texts exceed 256 tokens, so truncation discards potentially useful evidence. A 384-token limit would truncate 8.4\%, but that configuration has not been trained in this experiment. Neural softmax outputs are uncalibrated. Epoch selection and repeated reuse of validation may inflate apparent gains. The existing distribution gap remains unresolved until external scoring; no public improvement is asserted.
+About 50.5\% of validation texts exceed 256 tokens, so truncation discards potentially useful evidence. A 384-token limit would truncate 8.4\%, but that configuration has not been trained in this experiment. Neural softmax outputs are uncalibrated. Epoch selection and repeated reuse of validation may inflate apparent gains. The observed public scores remain below validation scores, showing that the distribution gap persists.
 
-The final neural candidate is retrained from the pinned pretrained weights on all 10,000 supplied labeled rows using the chosen epoch count and training settings. Its file is \path{artifacts/submission_deberta.csv}; the fixed ensemble is \path{artifacts/submission_deberta_robust_rank50.csv}. Prediction hashes and input hashes are recorded separately, so earlier leaderboard scores cannot transfer to new predictions. See \texttt{NEURAL\_EXPERIMENT.md} for reproduction and limitations. Both candidates need actual Kaggle evaluation before final report selection.
+The final neural candidate is retrained from the pinned pretrained weights on all 10,000 supplied labeled rows using the chosen epoch count and training settings. Its file is \path{artifacts/submission_deberta.csv}; the fixed ensemble is \path{artifacts/submission_deberta_robust_rank50.csv}. Prediction hashes and input hashes are recorded separately, so earlier leaderboard scores cannot transfer to new predictions. See \texttt{NEURAL\_EXPERIMENT.md} for reproduction and limitations. The public results motivate a separate robustness continuation, documented in the next appendix.
 \endgroup
 '''
 groups=pd.read_csv(O/'length_group_comparison.csv')
@@ -74,7 +74,7 @@ Human research abstracts and structured explanations account for several confide
 refit_path=O/'refit_summary.json'
 if refit_path.exists():
     refit=json.loads(refit_path.read_text())
-    tex=tex.replace('Both candidates need actual Kaggle evaluation before final report selection.', f"Full-data refit and test inference took {refit['elapsed_seconds']/60:.1f} minutes. Both candidates need actual Kaggle evaluation before final report selection.")
+    tex=tex.replace('The public results motivate a separate robustness continuation, documented in the next appendix.', f"Full-data refit and test inference took {refit['elapsed_seconds']/60:.1f} minutes. The public results motivate a separate robustness continuation, documented in the next appendix.")
 cm=e['confusion_matrix_at_logit_zero']
 tex=tex.replace('204 false positives and 18 false negatives (88.9\\% accuracy)', f'{cm[0][1]} false positives and {cm[1][0]} false negatives ({100*(cm[0][0]+cm[1][1])/sum(map(sum,cm)):.1f}\\% accuracy)')
 (R/'neural_appendix.tex').write_text(tex)

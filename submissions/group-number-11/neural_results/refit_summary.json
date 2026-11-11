@@ -25,7 +25,7 @@
   },
   "test_scores_sha256": "e4c92fbffbc85334a85d9a792647eb90a7ec39d8bc0ff0c8ca33699d4160337f",
   "prediction_sha256": "ad25adb0cdff64baa0e5d82bf3f71ac8cec1928bc66413fa0c45c56f99c4c07c",
-  "public_score": null,
+  "public_score": 0.92433,
   "private_score": null,
   "test_csv_sha256": "02209fdb74607f6b5f09a43300ed74761edf76f161cf9fd579cf43fb213884cd",
   "sample_submission_sha256": "2fdb037826ae4a83136c393fa9d29fd74d899b2dd06d32caadbe3a56e356193d",
@@ -33,5 +33,7 @@
     "train.csv": "325e345faf88fb1c4203278098c282e40319a87b4bf17e094d2f235f51d0c07e",
     "test.csv": "02209fdb74607f6b5f09a43300ed74761edf76f161cf9fd579cf43fb213884cd",
     "sample_submission.csv": "2fdb037826ae4a83136c393fa9d29fd74d899b2dd06d32caadbe3a56e356193d"
-  }
+  },
+  "status": "Submitted; public score confirmed by user screenshot",
+  "public_score_evidence": "User screenshot: submission_deberta.csv, Complete, public AUROC 0.92433"
 }

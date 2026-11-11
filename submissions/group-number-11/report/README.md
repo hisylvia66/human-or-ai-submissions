@@ -9,11 +9,11 @@ and rubric pages. No source passages or competition datasets are included.
 
 The main report documents the historical NB stage: NB-weighted word/character TF-IDF + LinearSVC C=0.5,
 validation AUROC 0.977012 and screenshot-confirmed Kaggle public AUROC 0.85994.
-The audit appendix records the newer NB/style blend: validation 0.988136 and confirmed public score 0.88628. The neural appendix records validation AUROC 0.989423 (DeBERTa) and 0.994594 (fixed rank blend), with no public score yet. This is a working report, not yet the final model selection.
+The audit appendix records the newer NB/style blend: validation 0.988136 and confirmed public score 0.88628. The neural appendix records validation AUROC 0.989423 (DeBERTa) and 0.994594 (fixed rank blend), with confirmed public scores 0.92433 and 0.92164, respectively. This is a working report, not yet the final model selection.
 Private AUROC is not yet available. The older word-only model scored 0.85049.
 
 In the repository, edit `report/status.json`, run `python build_report.py`, `python build_audit_report.py`, and
-`python build_neural_report.py`, compile
+`python build_neural_report.py`, and `python build_last_refinement_report.py`, compile
 `report/main.tex` and run `python package_report.py`. Tables and macros are derived
 from saved experiments. In Overleaf alone, update the public/private score macros
 and submission status in `metrics.tex` only after the matching submission is scored,

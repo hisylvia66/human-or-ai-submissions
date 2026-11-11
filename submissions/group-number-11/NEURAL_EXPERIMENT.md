@@ -68,8 +68,8 @@ probabilities. Selection remains exploratory on a reused holdout.
 |---|---:|---:|
 | Previously submitted NB/style blend | 0.988136 | 0.88628 |
 | DeBERTa epoch 1 | 0.987573 | Not submitted |
-| DeBERTa epoch 2 (selected) | 0.989423 | Not submitted |
-| Selected DeBERTa + fixed 50:50 rank blend | 0.994594 | Not submitted |
+| DeBERTa epoch 2 (selected; full-data refit) | 0.989423 | 0.92433 |
+| Selected DeBERTa + fixed 50:50 rank blend | 0.994594 | 0.92164 |
 
 The neural-versus-previous-blend AUROC gain is 0.001287, with a descriptive paired
 bootstrap interval [-0.003095, 0.005289]. The rank blend's gain is 0.006458,
@@ -97,3 +97,7 @@ normalizing and removing punctuation yields 0.980220. These are post-selection
 synthetic stress tests, not additional candidates or measured Kaggle conditions.
 The final submissions keep the validated whitespace-only preprocessing. Diagnostic
 inference took 6.8 minutes; no further model fitting was performed.
+
+Both scores above are confirmed by the user screenshots. The neural-only public
+score exceeds the rank blend despite the reverse validation ordering. A final
+local robustness continuation is documented in `FINAL_REFINEMENT.md`.
