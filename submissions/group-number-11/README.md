@@ -1,117 +1,88 @@
-# Group 11 — Human or AI?
+# Group Number 11: Human or AI?
 
-| Team member | NetID | Main contributions |
-|---|---|---|
-| Ansh Raj Bhargava | ab3396 | Q3 self-training and Q5 robustness experiments |
-| Yilin Gao | yg695 | Q1 pipeline, model comparison, tuning and shared split |
-| Yingzi Gu | yg667 | Q2/Q4, later model refinement, reproducibility and report integration |
+**Ansh Raj Bhargava (ab3396), Yilin Gao (yg695), Yingzi Gu (yg667)**
 
-## Final deliverables
+Kaggle team: **Group Number 11** · Submission branch: **submission/group-number-11**
 
-- **Final model: DeBERTa-v3-small**, public AUROC **0.92433**; fixed-validation AUROC **0.989423**. Private score is unknown.
-- [Final report PDF](report/report.pdf) · [LaTeX source](report/main.tex)
-- [Team branch and folder](https://github.com/hisylvia66/human-or-ai-submissions/tree/submission/group-number-11/submissions/group-number-11)
-- [Course submission PR #13](https://github.com/sekhari/human-or-ai-submissions/pull/13)
-- Selected Kaggle file: `artifacts/submission_deberta.csv`, generated locally and excluded from Git. Its exact prediction hash and confirmed score are in [the manifest](neural_results/refit_summary.json).
+[Final team branch](https://github.com/hisylvia66/human-or-ai-submissions/tree/submission/group-number-11) · [Course PR #13](https://github.com/sekhari/human-or-ai-submissions/pull/13)
 
-All project changes are in `submissions/group-number-11/`, on branch `submission/group-number-11`. The repository preserves experiments and negative results; historical script names containing `final` refer to the earlier NB stage, not the selected neural model.
+## Final result and submission materials
 
-## Confirmed submissions
+The final model, **medium_v4**, achieved **0.98921 Kaggle public AUROC** (team-reported, November 11, 2026) and **0.999822 validation AUROC** on the shared 2,000-row holdout. Private results remain unknown. Model selection is complete.
 
-| File | Model | Kaggle public AUROC |
-|---|---|---:|
-| `submission_word_svm_c05.csv` | Word SVM | 0.85049 |
-| `submission.csv` | NB-weighted word/character SVM | 0.85994 |
-| `submission_robust_blend.csv` | NB/stylometry blend | 0.88628 |
-| `submission_deberta_robust_rank50.csv` | Neural/classical rank blend | 0.92164 |
-| **`submission_deberta.csv`** | **Pure DeBERTa (selected)** | **0.92433** |
-| `submission_final_robust_neural.csv` | Robust neural continuation (rejected) | 0.91085 |
+| Material | Location |
+| --- | --- |
+| Submission-ready report | [report/main.pdf](report/main.pdf) |
+| Editable LaTeX | [report/main.tex](report/main.tex) |
+| Kaggle probabilities | `output/submission.csv` (local) |
+| Overleaf project | `output/group11_overleaf.zip` (local) |
+| PDF, CSV and Overleaf handoff | `output/Group_Number_11_final_materials.zip` (local) |
+| Locked version and checks | [current_best.json](results/optimization/current_best.json), [delivery_manifest.json](results/delivery_manifest.json) |
 
-All scores above were confirmed by user-provided Kaggle screenshots. The earlier team-message score 0.87240 was not confirmed and is not used. Best-public selection reuses leaderboard feedback; neither public nor reused validation performance is an untouched estimate of private-test performance.
+The scored CSV SHA256 is `ac75c035ad713459781168a1f475ef14bedff26e59657742f438391c70ddeef6`. `output/submission_medium_v4.csv` is the same scored file. CSVs, input data, checkpoints and intermediate caches are excluded from Git; reproduce them with the commands below.
 
-The rank blend had higher local validation AUROC (0.994594) but lower public performance than pure DeBERTa. The last continuation improved three synthetic stress tests but reduced public AUROC by 0.01348. Its final fitting budget was shorter than its development run; preprocessing, augmentation and context also changed. We do not attribute its failure to a single cause. Details: [neural experiment](NEURAL_EXPERIMENT.md), [rejected continuation](FINAL_REFINEMENT.md), [earlier distribution audit](PROJECT_REVIEW.md).
+## Setup and reproduction
 
-## Setup and selected-model reproduction
-
-Run all commands from this directory. Place the supplied `train.csv`, `unlabeled.csv`, `test.csv` and `sample_submission.csv` in `data/competition/`. Do not commit data, full passage excerpts, credentials, caches or weights. The fixed split is committed as `train_ids.csv` (8,000) and `validation_ids.csv` (2,000); never create a replacement split.
-
-The recorded neural environment is Python 3.14.2, PyTorch 2.10.0, Transformers 4.57.6, local Apple MPS and bfloat16. Dependencies are pinned in `requirements-neural.txt`. CPU fallback is slower; use FP32 if the backend lacks bfloat16 and record the changed configuration. GPU and environment differences can affect numerical reproduction.
+Run commands from the repository root. The tested environment is **Python 3.14.2, macOS arm64, 24 GiB RAM**; Apple MPS accelerates local language models. CPU fallback is supported but slower. On macOS, install the LightGBM runtime with `brew install libomp`. Tectonic is optional for rebuilding the PDF.
 
 ```bash
-python -m pip install -r requirements-neural.txt
-python download_pretrained.py
-python train_neural.py --data_dir data/competition --mode validate \
-  --epochs 2 --batch_size 16 --accumulation 2 --max_length 256 \
-  --learning_rate 0.00003 --precision bf16 --freeze_embeddings
-python evaluate_neural.py
-python diagnose_neural.py --data_dir data/competition
-python train_neural.py --data_dir data/competition --mode refit
-python verify_neural_results.py --data_dir data/competition
-python export_selected_submission.py
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r submissions/group-number-11/requirements-optimization.txt
 ```
 
-The downloader pins general-language pretrained weights to revision `a36c739020e01763fe789b4b85e2df55d6180012`. Supervised fine-tuning uses only competition labels. Development and full-data refit start independently from the original pretrained model; the all-label checkpoint is never used to evaluate the overlapping validation rows. The chosen epoch count is two. Whitespace normalization, first-256-token truncation and uncalibrated softmax scores are used. No pseudo-labels or ensemble enter the final selection. See `NEURAL_EXPERIMENT.md` for exact optimizer settings, timings and limitations.
-
-Reproduction creates `artifacts/submission_deberta.csv`. The export command verifies its manifest and writes the identical bytes to **`artifacts/final_submission/submission.csv`**, satisfying the course filename without overwriting the historical NB file. Confirmed scores belong to the recorded prediction hashes, not automatically to newly regenerated files; changed predictions archive prior scored manifests. No hidden labels or external prediction APIs are used.
-
-## Required experiments and evidence
-
-Q2 and Q3 deliberately retain classical configurations for controlled experiments; they are not neural learning curves or neural self-training results. Q4 in the final report evaluates the selected neural development checkpoint, including training/validation AUROC, three length groups and five FP/five FN with uncalibrated P(AI) and inspected hypotheses.
-
-| Question/stage | Code | Recorded evidence |
-|---|---|---|
-| Q1 comparison/tuning | `run_model_comparison.py`, `run_hyperparameter_tuning.py` | `final_results/q1_*.csv` |
-| Q2 fixed-model learning curve | `run_person_c_evaluation.py` | `person_c_results/`, nested subset IDs and plot |
-| Q3 unlabeled data | `run_unlabeled_experiment.py` | `unlabeled_*` files, historical teammate run |
-| Q4 selected DeBERTa | `evaluate_neural.py`, `diagnose_neural.py` | `neural_results/`, `neural_error_notes.json` |
-| Q5 original robustness | `run_robustness_improvement.py` | `robustness_*` files |
-| NB refinement | `run_final_refinement.py`, `evaluate_final_model.py` | `final_results/` |
-| Distribution audit/blend | `run_robustness_audit.py`, `run_iid_audit_control.py` | `audit_results/` |
-| Neural and fixed rank blend | `train_neural.py`, `compare_neural_candidates.py` | `neural_results/` |
-| Rejected continuation | `run_last_refinement.py`, `select_last_refinement.py` | `last_refinement_results/` |
-
-Classical reproduction uses `requirements-final.txt`:
+Place the original `train.csv`, `unlabeled.csv`, `test.csv` and `sample_submission.csv` together in a local data directory. This command trains/evaluates the components, extracts language features, and writes the final submission. It also rebuilds the report and handoff when Tectonic is available.
 
 ```bash
-python -m pip install -r requirements-final.txt
-python run_model_comparison.py --train_csv data/competition/train.csv --out final_results/q1_model_comparison.csv
-python run_hyperparameter_tuning.py --train_csv data/competition/train.csv --out final_results/q1_hyperparameter_tuning.csv
-python run_person_c_evaluation.py --train_csv data/competition/train.csv --review_text data/person_c_error_review.csv
-python run_final_refinement.py --data_dir data/competition
-python evaluate_final_model.py --data_dir data/competition
-python generate_final_submission.py --data_dir data/competition
-python verify_final_results.py --data_dir data/competition
+bash submissions/group-number-11/reproduce_final.sh \
+  cornell-tech-cs-5785-combined-2026-ai-vs-human-text
 ```
 
-The last four commands reproduce the **historical NB model**, not the final selected Kaggle model. They preserve its metrics and Q4 comparisons. Q2 sizes are 500/1,000/2,000/5,000/8,000, with unchanged word/character SVM settings and the same validation IDs. Its nested subsets use seed 42; each refits TF-IDF. Q3/Q5 original experiments write to the working directory, so replay them separately:
+Generic pretrained weights are downloaded from pinned Hugging Face revisions. Full reproduction is substantially slower than reblending cached predictions. After component inference, these stable entrypoints regenerate and verify the final CSV:
 
 ```bash
-mkdir -p artifacts/replay_q3 artifacts/replay_q5
-(cd artifacts/replay_q3 && python ../../run_unlabeled_experiment.py --data_dir ../../data/competition)
-(cd artifacts/replay_q5 && python ../../run_robustness_improvement.py --data_dir ../../data/competition)
+python submissions/group-number-11/predict_final.py \
+  --data cornell-tech-cs-5785-combined-2026-ai-vs-human-text \
+  --out submissions/group-number-11/output/submission.csv
+python submissions/group-number-11/verify_final.py \
+  --data cornell-tech-cs-5785-combined-2026-ai-vs-human-text \
+  --require-scored-hash
 ```
 
-Historical teammate versions were not pinned, so small numerical differences are possible. Person B's original calibration shares a training-only feature vocabulary across folds; the revised NB-stage self-training refits full pipelines per fold. The report distinguishes them. Initial scripts/notebooks and result files are retained as experimental history, not competing final entrypoints.
+Prediction reads cached component outputs and recorded weights; it does not retune or read training/validation labels. Verification checks all 3,000 test IDs, sample order, finite scores in [0, 1], CSV identity, validation labels and AUROC. The original scored file passed the strict hash check. Fresh retraining on a different platform can produce numerical differences; omit `--require-scored-hash` when checking such a new run. Kaggle receives continuous `id,label` scores, with `label` representing P(AI).
 
-For the audit and rejected continuation, use `PROJECT_REVIEW.md` and `FINAL_REFINEMENT.md`. `compare_neural_candidates.py` additionally requires the historical blend predictions; it is optional for reproducing the selected pure model.
+## Method and validation
 
-## Build PDF and standalone Overleaf project
+The final score is a 75%/25% logit blend of the neural hybrid and a second language-statistics detector. The hybrid combines 90% small-GPT-2/style scores and 10% locally fine-tuned RoBERTa scores in logit space. The second detector uses small/medium GPT-2 statistics, style features, LightGBM and label-free score alignment within formatting groups. [Optimization notes](docs/OPTIMIZATION.md) record model revisions, settings and the measured public-score sequence, including the rejected candidate.
+
+All required controlled experiments use the same stratified **8,000/2,000** split, seed **20261023**. Representations/classifiers fit training rows only during evaluation. Final tree components refit 10,000 labeled rows; RoBERTa retains its held-out-selected 8,000-row checkpoint (seed **20261111**). Supplementary split seeds are 20261024–20261026. The [baseline notes](docs/BASELINE.md) document model comparisons, hyperparameter grids, learning curves and the unlabeled-data experiment. Repeated holdout/public selection and distribution shift limit claims about private performance.
+
+## Repository map
+
+| Directory / file | Purpose |
+| --- | --- |
+| `predict_final.py`, `verify_final.py`, `reproduce_final.sh` | Stable final entrypoints, matching the report |
+| `src/` | Training, features, prediction, analysis and report/packaging implementation |
+| `scripts/` | Reference baseline, language_v2 and neural_v3 reproduction runners |
+| `docs/` | Baseline protocol and optimization history |
+| `results/` | Committed experiment evidence; [index](results/README.md) |
+| `report/` | Final PDF, LaTeX and referenced figures |
+| `report_metadata.json` | Team roles, public-score records and report settings |
+| `requirements-optimization.txt` | Pinned final-model dependencies |
+| `requirements.txt`, `environment.txt` | Original baseline environment |
+| `artifacts/`, `output/` | Local models/caches and generated deliveries; ignored by Git |
+
+To regenerate the report and packages after an intentional content change:
 
 ```bash
-python build_report.py
-python build_audit_report.py
-python build_neural_report.py
-python build_last_refinement_report.py
-tectonic --keep-logs --outdir artifacts/report report/main.tex
-python package_report.py
+python submissions/group-number-11/src/build_report.py
+(cd submissions/group-number-11/report && tectonic main.tex)
+python submissions/group-number-11/src/package.py
+python submissions/group-number-11/src/package_delivery.py
 ```
 
-Tectonic is a separate system dependency. The package command updates the versioned `report/report.pdf` and creates local `artifacts/group11_overleaf.zip`. Upload that ZIP to Overleaf, select `main.tex`, and compile with pdfLaTeX. Every table and figure is included. Do not upload the entire repository to Overleaf.
+## Team contributions and AI disclosure
 
-`report/status.json` records the selected model, all latest confirmed statuses and exact team names. The report retains historical required experiments but uses DeBERTa consistently in the final summary, Q4 and final prediction instructions. The rejected continuation's actual 0.91085 is included; private scores remain null.
+Yilin Gao led Q1 (model development); Ansh Raj Bhargava led Q3/Q5 (unlabeled data and improvements); Yingzi Gu led Q2/Q4 (learning curves and error analysis). All three also trained models and explored configurations. The final submission is consolidated on `submission/group-number-11` in `hisylvia66/human-or-ai-submissions`. Teammates should pull this branch before editing and push reviewed contributions here. `Group11retry` retains the development history, which is also included in the final merge.
 
-## Verification and disclosure
-
-The three existing verifiers (`verify_final_results.py`, `verify_neural_results.py`, `verify_last_refinement.py`) recompute saved metrics and check splits, selected checkpoints, submission IDs, transforms and hashes. `verify_audit_results.py` checks the earlier blend. Data-dependent verification requires local competition files; the repository is intentionally not a data distribution package.
-
-Codex assisted Yingzi Gu with code, execution, debugging, passage inspection, hypotheses and LaTeX drafting. Experiments were run and outputs checked; automated verification is not a claim of human review. Team members remain responsible for reviewing their contributions and disclosures. Error explanations are hypotheses, not causal attributions. No exact normalized cross-split duplicates were found; near duplicates were not exhaustively checked. Repeated holdout and public leaderboard use limit generalization claims.
+OpenAI Codex assisted with implementation, local experiment execution, diagnostics and report drafting. All authorship supervision uses supplied labels. Generic GPT-2/RoBERTa weights run locally; no hosted prediction API or external authorship labels are used. Automated checks cover data hashes, split/label alignment, metrics, output schema and scored-file identity. The team should review the code and interpretations before course submission. Incremental development history is preserved in `git log --oneline -- submissions/group-number-11`.

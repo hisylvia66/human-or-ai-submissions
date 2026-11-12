@@ -1,19 +1,12 @@
-# Local competition files, selected passages, generated submissions and bundles.
-/data/
-/artifacts/
-/submission*.csv
-*.log
-*.aux
-*.out
-*.synctex.gz
-# Explicitly version small, text-free experiment tables despite the root *.csv rule.
-!/final_results/*.csv
-!/person_c_results/*.csv
-
-# Audit result tables, excluding bulky per-row test diagnostics.
-!/audit_results/*.csv
-/audit_results/observable_features.csv
-/audit_results/domain_scores.csv
-!/neural_results/*.csv
-
-!/last_refinement_results/*.csv
+artifacts/
+output/
+__pycache__/
+report/*.aux
+report/*.log
+report/*.out
+report/*.synctex.gz
+report/*.fls
+report/*.fdb_latexmk
+report/*.xdv
+.pytest_cache/
+.ruff_cache/

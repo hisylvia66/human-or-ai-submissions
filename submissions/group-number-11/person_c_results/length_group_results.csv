@@ -1,4 +1,0 @@
-length_group,n,n_human,n_ai,min_words,max_words,validation_auroc,false_positives,false_negatives
-short,711,352,359,76,175,0.9587316409217522,26,48
-medium,643,355,288,176,240,0.9737969483568075,19,30
-long,646,293,353,241,350,0.9833895715901729,5,49

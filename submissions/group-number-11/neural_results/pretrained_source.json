@@ -1,8 +1,0 @@
-{
-  "model_id": "microsoft/deberta-v3-small",
-  "revision": "a36c739020e01763fe789b4b85e2df55d6180012",
-  "model_purpose": "General language pretraining, not an externally supervised AI-text detector",
-  "supervised_labels": "Only supplied competition train.csv",
-  "external_prediction_api_used": false,
-  "snapshot_dir": "artifacts/hf_cache/models--microsoft--deberta-v3-small/snapshots/a36c739020e01763fe789b4b85e2df55d6180012"
-}

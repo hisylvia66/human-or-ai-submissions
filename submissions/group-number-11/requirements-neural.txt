@@ -1,6 +1,0 @@
--r requirements-final.txt
-torch==2.10.0
-transformers==4.57.6
-huggingface-hub==0.36.2
-sentencepiece==0.2.3
-safetensors==0.8.0

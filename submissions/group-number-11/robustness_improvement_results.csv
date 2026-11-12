@@ -1,5 +1,0 @@
-config,description,fit_s,train_auroc,val_clean,val_typo,val_homoglyph,val_zero_width,delta_vs_R1_clean,delta_vs_R1_typo,delta_vs_R1_homoglyph,delta_vs_R1_zero_width
-R0,word TF-IDF + LinearSVC (Q1 reference),5.12,1.0,0.943264,0.940392,0.902724,0.918496,,,,
-R1,word+char TF-IDF + LinearSVC (BASELINE),28.53,1.0,0.971122,0.96961,0.957776,0.9600190000000001,,,,
-R2,R1 + unicode normalization,28.94,1.0,0.9597,0.95756,0.9597,0.9597,"-0.0114 [-0.0147, -0.0085]","-0.0121 [-0.0153, -0.0091]","+0.0019 [-0.0020, +0.0059]","-0.0003 [-0.0038, +0.0031]"
-R3,R2 + typo augmentation (both classes),53.96,1.0,0.9590110000000001,0.9573069999999999,0.9590110000000001,0.9590110000000001,"-0.0121 [-0.0155, -0.0089]","-0.0123 [-0.0157, -0.0091]","+0.0012 [-0.0027, +0.0054]","-0.0010 [-0.0044, +0.0024]"

@@ -1,9 +1,0 @@
-set,group,n,non_ascii_letter,cyrillic,zero_width,changed_by_normalize
-train(8k),all,8000,536,15,19,305
-train(8k),human,4000,246,5,2,30
-train(8k),AI,4000,290,10,17,275
-val,all,2000,132,2,4,77
-val,human,1000,52,1,0,3
-val,AI,1000,80,1,4,74
-unlabeled,all,3000,189,4,3,95
-test,all,3000,182,5,4,89

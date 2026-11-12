@@ -1,7 +1,0 @@
-config,description,train_auroc,validation_auroc,fit_seconds,pseudo_rounds
-baseline,Word + character TF-IDF / SVM C=0.5,1.0,0.971228,9.79699141625315,[]
-char_weight2,Character block weighted 2x / SVM C=0.5,1.0,0.9713489999999999,9.784812209196389,[]
-char_only,Character TF-IDF only / SVM C=0.5,0.9999779375,0.969718,8.26603891607374,[]
-logreg,Word + character TF-IDF / Logistic Regression C=5,1.0,0.9693309999999999,12.054297416470945,[]
-nbsvm,Binary document log-count-ratio weighted TF-IDF / SVM C=0.5,0.9999640000000001,0.977012,10.390777791850269,[]
-selftrain2,"Two-round self-training, confidence 0.90, SVM C=0.5",1.0,0.972186,41.139567917212844,"[{""round"": 1, ""n_pseudo"": 2171, ""n_pseudo_ai"": 1055}, {""round"": 2, ""n_pseudo"": 2254, ""n_pseudo_ai"": 1086}]"
