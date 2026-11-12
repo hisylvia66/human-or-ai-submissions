@@ -277,7 +277,7 @@ The generalization audit showed that the score survives removing two high-simila
 The augmentation follow-up measured a substantial robustness gain that still missed its predefined acceptance criterion. These lessons are recorded as actual experiments rather than retrospective claims that every change helped.
 Commit hashes identify development history; inspect the hosted PR or use \texttt{git show HASH} locally.
 \q{Q6.3}{AI assistance and verification.}
-OpenAI Codex assisted with pipeline design, code, debugging, experiment execution, analysis and report drafting.
+OpenAI Codex assisted Yingzi Gu with pipeline design, code, debugging, experiment execution, analysis and report drafting.
 Experiments were run locally on the supplied data; offline scores come from their logs, while the public score was supplied by the team.
 Automated checks verify the fixed split, validation labels/AUC, data hashes, output IDs/order and finite probability bounds.
 No external LLM API was used to label or predict passages; no pretrained model weights or external supervised examples were used.
@@ -290,10 +290,22 @@ Before course submission, the team needs to review the code, interpretations and
 \textbf{Submission status.} ''',status,r'''
 \end{document}
 '''])
-    (ROOT/'report/main.tex').write_text('\n'.join(line.rstrip() for line in '\n'.join(parts).splitlines())+'\n')
+    text='\n'.join(parts)
+    disclosures=meta.get('individual_ai_disclosures',[])
+    if disclosures:
+        marker=text.index(r'\vspace{.1in}',text.index(r'\q{Q6.3}'))
+        individual=('The individual disclosures below also cover earlier experiments retained in the merged team history.\n\n'
+                    +'\n\n'.join(esc(item['statement']) for item in disclosures)+'\n\n')
+        text=text[:marker]+individual+text[marker:]
+    (ROOT/'report/main.tex').write_text('\n'.join(line.rstrip() for line in text.splitlines())+'\n')
     if meta.get('optimization_final'):
         from report_optimization import upgrade_report
         upgrade_report(meta)
+    if disclosures:
+        path=ROOT/'report/main.tex'
+        marker=r'\q{Q6.3}{AI assistance and verification.}'
+        page=r'\newpage'+'\n'+r'\section*{AI assistance and individual contributions}'+'\n'
+        path.write_text(path.read_text().replace(marker,page+marker,1))
     print(ROOT/'report/main.tex')
 
 
