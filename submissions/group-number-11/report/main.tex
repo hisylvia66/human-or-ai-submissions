@@ -37,8 +37,8 @@ Yingzi Gu & \texttt{yg667} \\
 \bottomrule
 \end{tabularx}
 
-\textbf{GitHub PR:} \url{https://github.com/sekhari/human-or-ai-submissions/pull/18}\par
-\textbf{Working branch:} \texttt{Group11retry}. This rebuild starts from the course repository main branch; it does not depend on the earlier team implementation.
+\textbf{GitHub PR:} \url{https://github.com/sekhari/human-or-ai-submissions/pull/13}\par
+\textbf{Submission branch:} \texttt{submission/group-number-11}. Development branch: \texttt{Group11retry}.
 \section*{Team information and model summary}
 \q{Q0.1}{Team and contributions.}Yilin Gao (yg695) led model development and comparison (Q1): data inspection, the shared split, representations, baseline comparisons and tuning. Ansh Raj Bhargava (ab3396) led the unlabeled-data and improvement experiments (Q3 and Q5). Yingzi Gu (yg667) led learning curves, subgroup evaluation and error analysis (Q2 and Q4). All three members also trained models and explored stronger configurations. These roles were supplied by the team; the implementation and experiment execution in this rebuilt branch were assisted by Codex.
 \q{Q0.2}{Final approach.}
@@ -272,7 +272,7 @@ A next experiment would canonicalize formatting throughout training and inferenc
 \section{Code, reproducibility and AI assistance}
 \q{Q6.1}{PR, environment and entrypoints.}
 \textbf{PR URL:}
-\url{https://github.com/sekhari/human-or-ai-submissions/pull/18}
+\url{https://github.com/sekhari/human-or-ai-submissions/pull/13}
 
 \textbf{Location:} \texttt{submissions/group-number-11/}.\par
 Initial baseline versions are recorded in \texttt{environment.txt} and \texttt{requirements.txt}.
@@ -290,9 +290,9 @@ python submissions/group-number-11/predict_final.py \
 \end{verbatim}\end{quote}
 The reproduction script recreates the components; \texttt{predict\_final.py} writes the frozen blend from cached inference outputs. Data, model weights and caches are excluded from Git.
 \q{Q6.2}{Development history and lessons.}\begin{itemize}[leftmargin=1.5em,itemsep=3pt]
-\item \href{https://github.com/Gracee-Gu/human-or-ai-submissions/commit/e31a805}{e31a805}: Build fixed-holdout text and stylometric training pipeline
-\item \href{https://github.com/Gracee-Gu/human-or-ai-submissions/commit/09c05b0}{09c05b0}: Test format-robust classifiers and document negative public result
-\item \href{https://github.com/Gracee-Gu/human-or-ai-submissions/commit/f8c557e}{f8c557e}: Add frozen GPT-2 detector reaching 0.98665 public AUROC
+\item \href{https://github.com/hisylvia66/human-or-ai-submissions/commit/e31a805}{e31a805}: Build fixed-holdout text and stylometric training pipeline
+\item \href{https://github.com/hisylvia66/human-or-ai-submissions/commit/09c05b0}{09c05b0}: Test format-robust classifiers and document negative public result
+\item \href{https://github.com/hisylvia66/human-or-ai-submissions/commit/f8c557e}{f8c557e}: Add frozen GPT-2 detector reaching 0.98665 public AUROC
 \end{itemize}The initial pipeline established the shared split and baseline comparisons. The format-robust follow-up showed that synthetic stress improvement did not transfer to public performance. The language-feature change then improved both the fixed validation score and the user-reported public score. These are actual development checkpoints; the experiments and their negative results are retained for review.
 \q{Q6.3}{AI assistance and verification.}
 OpenAI Codex assisted with pipeline design, code, debugging, experiment execution, analysis and report drafting.
@@ -304,7 +304,7 @@ Team-reported roles appear in Q0.1; the team must review the submitted code and 
 \textbf{Sources.} The supplied \emph{Kaggle Competition Template Report} PDF/LaTeX provides the protocol and Q0--Q6 requirements; the course README provides the repository layout. Offline results come from saved experiment logs; public results were supplied by the team. No external label source was consulted.
 \vspace{.1in}
 \textbf{Submission status.}
-The team reported public AUROC 0.98921 for the optimized submission, following 0.96962 for the first rebuild and 0.92433 for the earlier model. Private results remain pending. See the title page for the draft PR.
+The team reported public AUROC 0.98921 for the optimized submission, following 0.96962 for the first rebuild and 0.92433 for the earlier model. Private results remain pending. See the title page for the course PR.
 
 \textbf{Compute and limitations.} Language-feature extraction took minutes on the local Apple GPU and is cached for reuse; the language-parent classifier stage took about 23 seconds with cached features. This is not directly comparable to the initial CPU feature-plus-fit timings. The final tree fits use all 10,000 true labeled rows after selection, with paired style views counted as augmentation rather than new independent data. Generic pretrained language knowledge is the only added external model resource. Public feedback was used to reject the robust candidate and confirm the language candidate; no hidden individual labels were accessed. The repeated holdout search and small public subset remain sources of selection uncertainty.
 
